@@ -12,7 +12,7 @@ Developers and coding agents can use the [platform adaptation guide](docs/PORTIN
 
 The native screensaver is experimental. It needs a **rooted LG webOS TV**, Homebrew Channel, and [Glasshouse](https://rorygallagher2024.github.io/glasshouse/install/) with its **Starfield** screensaver selected. It does not require TV Clean or its launcher. A different replacement of Starfield, including the older TV Clean radar, must be restored before activation. Root availability depends on the TV model and firmware; this is not an LG App Store app. The on-TV setup and native map have been exercised on one webOS 5 TV; this release's display changes, compatibility with other models and persistence after a physical restart have not been established.
 
-Download the location-free `.ipk` installer from the [latest GitHub release](https://github.com/hugo-alves/airplane-screensaver-public/releases/latest).
+Download the location-free `.ipk` installer from [GitHub Releases](https://github.com/hugo-alves/airplane-screensaver-public/releases).
 
 To install it, use the Glasshouse dashboard's **Apps → Install app from a URL or file → Upload .ipk** from a computer or phone. Enable that option for the upload, confirm the package, and turn it off again afterwards. Alternatively, install the IPK using your existing webOS development tools.
 
