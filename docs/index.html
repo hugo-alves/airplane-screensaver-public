@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Airplane Screensaver for LG webOS | Live Aircraft Radar</title>
+  <meta name="description" content="An experimental aircraft-tracking screensaver for rooted LG webOS TVs. Choose your city and observation radius. Open source, with a browser preview and porting guide.">
+  <link rel="canonical" href="https://hugo-alves.github.io/airplane-screensaver-public/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Airplane Screensaver for LG webOS">
+  <meta property="og:description" content="Watch nearby aircraft on your TV. An experimental, configurable screensaver for rooted LG webOS.">
+  <meta property="og:url" content="https://hugo-alves.github.io/airplane-screensaver-public/">
+  <meta property="og:image" content="https://hugo-alves.github.io/airplane-screensaver-public/images/simulated-flight.webp">
+  <meta property="og:image:alt" content="A simulated flight over a public example location in the screensaver">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0a1114">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Airplane Screensaver home">
+      <svg class="brand-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"></circle><circle cx="16" cy="16" r="7"></circle><path d="M16 16 25 7"></path><circle class="blip" cx="21" cy="11" r="2"></circle></svg>
+      <span>AIRPLANE<br>SCREENSAVER</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#how-it-works">How it works</a>
+      <a href="#install">Install</a>
+      <a class="nav-github" href="https://github.com/hugo-alves/airplane-screensaver-public">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="eyebrow"><span class="status-dot"></span> OPEN SOURCE <span class="separator">/</span> EXPERIMENTAL</div>
+      <h1 id="hero-title">Look up.<br><em>Without looking up.</em></h1>
+      <p class="hero-copy">A live aircraft radar for your TV. Watch the planes near a city you choose, with their estimated positions, trails and flight details.</p>
+      <p class="hero-note">For rooted LG webOS TVs with Homebrew Channel and Glasshouse.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/hugo-alves/airplane-screensaver-public/releases">Get the installer <span aria-hidden="true">↗</span></a>
+        <a class="button secondary" href="#how-it-works">Explore the project <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-art">
+        <div class="art-top"><span><i></i> SIMULATED FLIGHT</span><span>PUBLIC EXAMPLE LOCATION</span></div>
+        <img src="images/simulated-flight.webp" alt="Airplane screensaver showing a simulated aircraft over a public example location" width="1600" height="900" fetchpriority="high">
+        <div class="art-bottom"><span>PREVIEW / NOT A REAL FLIGHT</span><span>Map © OpenMapTiles · © OpenStreetMap contributors, via OpenFreeMap</span></div>
+      </div>
+    </section>
+
+    <section class="section intro" id="how-it-works" aria-labelledby="intro-title">
+      <div class="section-label"><span>01</span> THE IDEA</div>
+      <div>
+        <h2 id="intro-title">The sky around you,<br><em>on your screen.</em></h2>
+        <p class="section-copy">Choose a city and an observation radius on your TV. When a nearby aircraft is detected, the screensaver follows it across the map and shows available flight information.</p>
+        <div class="features">
+          <div><span class="feature-number">01 / LOCATION</span><h3>Make it yours</h3><p>Choose your own city and a radius from 1 to 50 km.</p></div>
+          <div><span class="feature-number">02 / DISPLAY</span><h3>Read it your way</h3><p>Use English or Portuguese, and metric or aviation units.</p></div>
+          <div><span class="feature-number">03 / DATA</span><h3>Follow the flight</h3><p>See estimated positions, trails and details when available from the data providers.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section install" id="install" aria-labelledby="install-title">
+      <div class="section-label"><span>02</span> GET STARTED</div>
+      <div>
+        <h2 id="install-title">Ready for <em>takeoff?</em></h2>
+        <p class="section-copy">This is a homebrew project, not an LG App Store app. Installation requires a <strong>rooted LG webOS TV</strong>, the Homebrew Channel and Glasshouse with its Starfield screensaver selected.</p>
+        <ol class="steps">
+          <li><span>01</span><div><h3>Download the IPK</h3><p>Get the experimental installer from GitHub Releases. It does not contain a preselected personal location.</p></div></li>
+          <li><span>02</span><div><h3>Install on your TV</h3><p>Use the Glasshouse dashboard to upload the IPK, following the installation guide.</p></div></li>
+          <li><span>03</span><div><h3>Choose your sky</h3><p>Open the app on your TV, select a city, radius, language and units, then prepare and activate it.</p></div></li>
+        </ol>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/hugo-alves/airplane-screensaver-public/releases">Download on GitHub <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="https://github.com/hugo-alves/airplane-screensaver-public#lg-webos-install-and-configure-on-the-tv">Read the full installation guide <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="fine-print">The on-TV setup and native map have been exercised on one webOS 5 TV. The current release's display changes, other models and persistence after a physical restart have not been verified.</p>
+      </div>
+    </section>
+
+    <section class="section questions" aria-labelledby="questions-title">
+      <div class="section-label"><span>03</span> GOOD TO KNOW</div>
+      <div>
+        <h2 id="questions-title">A few <em>details.</em></h2>
+        <div class="faq">
+          <div><h3>Can I install it on any LG TV?</h3><p>No. The native version needs a rooted LG webOS TV, Homebrew Channel and Glasshouse. Root availability depends on the model and firmware.</p></div>
+          <div><h3>Does it work on other devices?</h3><p>There is a local browser preview, but no native Android TV, Google TV, Samsung TV or Apple TV version is implemented or verified. Developers and coding agents can use the <a href="https://github.com/hugo-alves/airplane-screensaver-public/blob/main/docs/PORTING.md">porting guide</a> without an LG TV.</p></div>
+          <div><h3>Is the flight data real?</h3><p>The screensaver uses live aircraft feeds, with estimated positions and coverage that varies by provider. The image on this page uses a clearly labelled simulated flight.</p></div>
+          <div><h3>What happens to my location?</h3><p>Your selection is kept on the TV. Third-party services receive city searches, approximate coordinates or map requests, and the local helper exposes the exact selection to other apps on that TV. Read the <a href="https://github.com/hugo-alves/airplane-screensaver-public#privacy-and-data">privacy details</a>.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-brand">AIRPLANE SCREENSAVER <span>✳</span></div>
+    <p>Open source under the MIT licence. Third-party data providers have their own terms.</p>
+    <div class="footer-links"><a href="https://github.com/hugo-alves/airplane-screensaver-public">Source &amp; documentation ↗</a><a href="https://github.com/hugo-alves/airplane-screensaver-public/blob/main/docs/PORTING.md">Porting guide ↗</a></div>
+  </footer>
+</body>
+</html>

@@ -1,6 +1,18 @@
-# Airplane screensaver
+# Airplane screensaver for LG webOS
 
-An aircraft radar display showing nearby aircraft on an animated map, with estimated positions, trails and flight information. Choose Portuguese or English and metric or aviation units (nautical miles, feet and knots).
+An experimental aircraft-tracking screensaver for rooted LG webOS TVs. It shows nearby aircraft on an animated map with estimated positions, trails and flight information. Choose a city, observation radius, Portuguese or English, and metric or aviation units.
+
+[Download the experimental installer](https://github.com/hugo-alves/airplane-screensaver-public/releases) · [LG installation](#lg-webos-install-and-configure-on-the-tv) · [Adapt to another platform](docs/PORTING.md) · [Project website](https://hugo-alves.github.io/airplane-screensaver-public/)
+
+![Airplane screensaver with a simulated aircraft over a public example location](docs/images/simulated-flight.webp)
+
+*A simulated flight over a public example location, not a real flight. Map data © OpenMapTiles and © OpenStreetMap contributors via OpenFreeMap.*
+
+| Platform | Status |
+| --- | --- |
+| Rooted LG webOS with Homebrew Channel and Glasshouse | Experimental native screensaver. The setup and map have been exercised on one webOS 5 TV; the current release's display changes and restart persistence have not been physically verified. |
+| Browser on a computer | Local preview and simulation; not an operating-system screensaver. |
+| Android TV, Google TV, Samsung TV, Apple TV and other platforms | Native integrations are not implemented or verified. See the [porting guide](docs/PORTING.md). |
 
 ## Browser
 

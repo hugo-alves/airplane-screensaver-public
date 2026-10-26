@@ -22,8 +22,10 @@ Keep portable flight logic, platform UI, data transport, and installation
 separate. Reuse existing modules when the target supports them; `native/` and
 the local preview relay are examples, not drop-in installers or backends for
 other platforms. Keep city, radius, language, and units configurable. Do not
-put a person's location, credentials, generated configuration, or recordings in
-source control or examples; use public demonstration data.
+put a person's location, credentials, generated configuration, or personal
+recordings in source control or examples. A reviewed static demonstration
+image may use simulated aircraft and a public example location if it is clearly
+labelled, includes map attribution, and contains no personal or device details.
 
 Preserve the simulated/live distinction, provider terms and attribution, and
 reversible installation or restoration where the platform supports it. Never

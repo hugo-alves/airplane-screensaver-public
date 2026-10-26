@@ -30,8 +30,31 @@ test('a fresh browser can see a clearly labelled simulated flight without storin
     await until(()=>d.querySelector('.flight-code')&&d.querySelector('.flight-code').textContent==='TEST1234');
     assert.equal(d.querySelector('.flight-screen').hidden,false);
     assert.match(d.querySelector('.preview-simulation').textContent,/SIMULADOS/);
+    assert.doesNotMatch(d.querySelector('.preview-simulation').textContent,/REFERÊNCIA PÚBLICA|PUBLIC REFERENCE/i);
+    await until(()=>d.querySelector('.flight-route-note').textContent==='Rota simulada');
+    assert.equal(d.querySelector('.flight-age').textContent,'DADOS SIMULADOS');
     assert.equal(d.querySelector('.preview-controls').hidden,true);
     assert.equal(dom.window.localStorage.getItem('airplane-screensaver.zone'),null);
+    assert.deepEqual(requests,[]);
+  }finally{dom.window.close();}
+});
+
+test('simulation does not describe a saved or newly chosen location as public',async()=>{
+  const {dom,requests}=await openPreview('?simulation=1&phase=overhead',{
+    location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:5,language:'en',units:'metric'
+  });
+  try{
+    const d=dom.window.document;
+    await until(()=>d.querySelector('.flight-code')&&d.querySelector('.flight-code').textContent==='TEST1234');
+    assert.match(d.querySelector('.preview-simulation').textContent,/SIMULATED DATA/);
+    assert.doesNotMatch(d.querySelector('.preview-simulation').textContent,/PUBLIC REFERENCE|REFERÊNCIA PÚBLICA/i);
+    await until(()=>d.querySelector('.flight-route-note').textContent==='Simulated route');
+    assert.equal(d.querySelector('.flight-age').textContent,'SIMULATED DATA');
+    d.querySelector('[name=name]').value='London';
+    d.querySelector('[name=latitude]').value='51.5072';
+    d.querySelector('[name=longitude]').value='-0.1276';
+    d.querySelector('.preview-controls').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));
+    assert.doesNotMatch(d.querySelector('.preview-simulation').textContent,/PUBLIC REFERENCE|REFERÊNCIA PÚBLICA/i);
     assert.deepEqual(requests,[]);
   }finally{dom.window.close();}
 });

@@ -9,7 +9,6 @@ async function boot() {
   const designPreview = params.get('design') === 'quiet';
   const simulation = params.get('simulation') === '1';
   if (designPreview) document.body.classList.add('design-preview');
-  const publicPreview = true;
   // Explicit test mode needs no personal location on a fresh browser. This
   // public city centre stays in memory unless the user changes and saves it.
   const initial = simulation && !saved.location ? {location: {name: 'Paris · demo', latitude: 48.8566, longitude: 2.3522}, radiusKm: 5} : saved;
@@ -37,7 +36,7 @@ async function boot() {
   if (simulation) {
     const label = document.createElement('div');
     label.className = 'preview-simulation';
-    label.textContent = 'TESTE DE CÂMARA · DADOS SIMULADOS' + (publicPreview ? ' · REFERÊNCIA PÚBLICA' : '');
+    label.textContent = 'TESTE DE CÂMARA · DADOS SIMULADOS';
     document.getElementById('preview-shell').appendChild(label);
     testLink.href = '/'; testLink.textContent = 'VOLTAR A DADOS REAIS';
   }
@@ -57,12 +56,12 @@ async function boot() {
   };
   if (designPreview) {
     const label = document.createElement('div'); label.className = 'preview-simulation';
-    label.textContent = 'PRÉ-VISUALIZAÇÃO · DADOS DE EXEMPLO · REFERÊNCIA PÚBLICA';
+    label.textContent = 'PRÉ-VISUALIZAÇÃO · DADOS DE EXEMPLO';
     document.getElementById('preview-shell').appendChild(label);
   }
   const radar = createFlightScreensaver({rootEl: document.getElementById('preview-root'),
     getConfig: function () { return config; }, client: designPreview ? designClient : simulation ? testClient : undefined,
-    previewTime: designPreview ? '21:42' : undefined,
+    previewTime: designPreview ? '21:42' : undefined, simulated: designPreview || simulation,
     homeLabel: 'REFERÊNCIA'});
   if (saved.location || simulation) radar.start();
   window.addEventListener('pagehide', function () { radar.stop(); });

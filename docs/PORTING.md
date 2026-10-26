@@ -163,4 +163,8 @@ logic only where the runtimes support it.
 City searches, map tiles and aircraft APIs are third-party requests and can
 expose the search or approximate region and network address. See the privacy
 and data section of [README.md](../README.md). Keep generated configuration,
-maps, screenshots and personal locations out of the repository and releases.
+maps, screenshots containing personal locations or device details, and other
+personal data out of the repository and releases. A reviewed demonstration
+image is acceptable when it uses only simulated aircraft and a public example
+location, is clearly labelled, includes map attribution, and contains no
+personal or device details.

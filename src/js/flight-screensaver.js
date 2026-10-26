@@ -141,7 +141,7 @@ export function createFlightScreensaver(options) {
   function updateLabels(positions, selected, now) {
     text(el.clock, options.previewTime || new Date(now).toLocaleTimeString(locale(config().language), {hour: '2-digit', minute: '2-digit'}));
     text(el.count, positions.length + (positions.length === 1 ? ' AERONAVE' : ' AERONAVES'));
-    text(el.connection, options.replay ? 'REPETIÇÃO · VOO REAL' : failures ? tr('A TENTAR RESTABELECER LIGAÇÃO') : lastSuccess ? tr('SINAL RECEBIDO') : tr('A RECEBER DADOS'));
+    text(el.connection, options.simulated ? tr('DADOS SIMULADOS') : options.replay ? 'REPETIÇÃO · VOO REAL' : failures ? tr('A TENTAR RESTABELECER LIGAÇÃO') : lastSuccess ? tr('SINAL RECEBIDO') : tr('A RECEBER DADOS'));
     screen.classList.toggle('is-offline', !!failures);
     if (!selected) {
       text(el.code, tr('À ESCUTA'));
@@ -167,7 +167,7 @@ export function createFlightScreensaver(options) {
       ? extra.origin.toLocaleUpperCase('pt-PT') + ' → ' + extra.destination.toLocaleUpperCase('pt-PT')
       : tr('ROTA NÃO DISPONÍVEL'));
     el.route.classList.toggle('is-long', el.route.textContent.length > 22);
-    text(el['route-note'], extra.origin && extra.destination ? tr('Rota publicada · ADSBdb') : tr('Rota não publicada pela fonte'));
+    text(el['route-note'], options.simulated ? tr('Rota simulada') : extra.origin && extra.destination ? tr('Rota publicada · ADSBdb') : tr('Rota não publicada pela fonte'));
     text(el.airline, (extra.airline || tr('IDENTIFICAÇÃO DA AERONAVE')).toLocaleUpperCase('pt-PT'));
     el.airline.classList.toggle('is-long', el.airline.textContent.length > 22);
     text(el.model, (extra.model || selected.model || extra.registration || selected.registration || tr('Modelo não disponível')).toLocaleUpperCase('pt-PT'));
@@ -176,7 +176,7 @@ export function createFlightScreensaver(options) {
     text(el.altitude, altitudeState === 'valid' ? altitude(selected.altitudeM, config().units, config().language) : '—');
     text(el['altitude-note'], altitudeState === 'below-zero' ? tr('Leitura barométrica abaixo de zero') : '');
     text(el.speed, selected.speedKmh === null ? '' : speed(selected.speedKmh, config().units, config().language));
-    text(el.age, options.replay ? 'Trajeto gravado · posição interpolada' : (config().language === 'en' ? 'ADSB.lol · ' : 'ADSB.lol · há ') + Math.floor(selected.ageSeconds) + (config().language === 'en' ? ' s ago' : ' s'));
+    text(el.age, options.simulated ? tr('DADOS SIMULADOS') : options.replay ? 'Trajeto gravado · posição interpolada' : (config().language === 'en' ? 'ADSB.lol · ' : 'ADSB.lol · há ') + Math.floor(selected.ageSeconds) + (config().language === 'en' ? ' s ago' : ' s'));
   }
 
   function render(timestamp) {
