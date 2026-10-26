@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Airplane Screensaver</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0d171d;color:#eaf3f2;font-family:Arial,sans-serif}
+body{padding:4vh 5vw}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2vh}
+h1{font-size:3.4vh;margin:0;letter-spacing:.02em}h2{font-size:2.4vh;margin:0 0 1.5vh}.muted{color:#a7b9bb;font-size:1.8vh;line-height:1.35}
+.layout{display:flex;gap:3vw}.panel{background:#14262d;border:1px solid #314850;border-radius:1.1vh;padding:2.4vh 2vw}
+.city{width:59%}.options{width:41%}.line{display:flex;align-items:center;gap:1vw}.line input{flex:1;min-width:0}
+label{display:block;color:#b8c9c9;font-size:1.8vh;margin:1.6vh 0 .8vh}
+button,input{border:2px solid #526c72;border-radius:.6vh;background:#1c333b;color:#fff;font:inherit;font-size:2.05vh;padding:1.2vh 1vw}
+button{cursor:pointer}button:focus,input:focus{outline:3px solid #85e4c7;outline-offset:3px;background:#294b50}
+button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-color:#8adfbd;font-weight:bold}
+.primary:focus{background:#b9f4df;color:#08221c}
+.wide{width:100%;margin-top:1vh}.secondary{font-size:1.75vh}.option{padding:1.4vh 0;border-bottom:1px solid #314850;display:flex;align-items:center;justify-content:space-between;gap:1vw}
+.option span{font-size:2vh}.option button{min-width:4vw}.value{min-width:6vw;text-align:center;font-size:2vh}
+#results{margin-top:1.4vh;max-height:40vh;overflow:auto}#results button{display:block;width:100%;text-align:left;margin-bottom:.6vh;padding:1vh}
+#selected{margin:1.5vh 0 0;color:#a9e6cd;min-height:2.7vh;font-size:1.8vh}
+#status{min-height:4.2vh;margin:1.8vh 0 .5vh;color:#c6dcda;font-size:1.75vh;line-height:1.3}
+#status.error{color:#ffb9a6}.footer{margin-top:1vh;font-size:1.55vh;color:#91a9aa}
+</style>
+</head>
+<body>
+<header><h1>✈ AIRPLANE SCREENSAVER</h1><button id="language" type="button">English</button></header>
+<div class="layout">
+ <section class="panel city">
+  <h2 id="cityTitle">Choose a city</h2>
+  <div class="muted" id="cityHelp">Search and select a result. The city centre is enough.</div>
+  <label id="cityLabel" for="city">City</label>
+  <div class="line"><input id="city" type="text" maxlength="100" autocomplete="off"><button id="search" type="button">Search</button></div>
+  <div id="selected"></div><div id="results"></div>
+ </section>
+ <section class="panel options">
+  <h2 id="optionsTitle">Display settings</h2>
+  <div class="option"><span id="radiusLabel">Observation radius</span><div class="line"><button id="less" type="button" aria-label="Decrease radius">−</button><strong id="radius" class="value">5 km</strong><button id="more" type="button" aria-label="Increase radius">+</button></div></div>
+  <div class="option"><span id="unitsLabel">Units</span><button id="units" type="button">Metric</button></div>
+  <p class="muted" id="prerequisite">Requires a rooted LG TV, Homebrew Channel and Glasshouse, with Starfield selected.</p>
+  <button class="primary wide" id="save" type="button">Prepare and activate</button>
+  <button class="wide secondary" id="restore" type="button">Restore previous screensaver</button>
+  <div id="status" aria-live="polite"></div>
+ </section>
+</div>
+<div class="footer" id="footer">Use the arrows and OK on your remote. Back closes this app.</div>
+<script>
+(function(){
+ var text={
+  en:{language:'English',cityTitle:'Choose a city',cityHelp:'Search and select a result. The city centre is enough.',cityLabel:'City',search:'Search',selected:'Selected: ',optionsTitle:'Display settings',radiusLabel:'Observation radius',unitsLabel:'Units',metric:'Metric',aviation:'Aviation',prerequisite:'Requires a rooted LG TV, Homebrew Channel and Glasshouse, with Starfield selected.',save:'Prepare and activate',restore:'Restore previous screensaver',footer:'Use the arrows and OK on your remote. Back closes this app.',searching:'Searching…',noResults:'No cities found. Try another name.',selectCity:'Search for and select a city first.',starting:'Starting…',map:'Preparing the map',install:'Activating the screensaver…',complete:'Ready! The screensaver is configured.',restoring:'Restoring…',restored:'The previous screensaver has been restored.',service:'Homebrew Channel root service is unavailable.',failed:'Could not complete setup: ',installed:'Current location: ',press:'Select a city from the results.'},
+  pt:{language:'Português',cityTitle:'Escolhe uma cidade',cityHelp:'Pesquisa e seleciona um resultado. O centro da cidade é suficiente.',cityLabel:'Cidade',search:'Pesquisar',selected:'Selecionada: ',optionsTitle:'Definições',radiusLabel:'Raio de observação',unitsLabel:'Unidades',metric:'Métricas',aviation:'Aviação',prerequisite:'Requer uma TV LG com root, Homebrew Channel e Glasshouse, com Starfield selecionado.',save:'Preparar e ativar',restore:'Repor screensaver anterior',footer:'Usa as setas e OK no comando. Voltar fecha esta aplicação.',searching:'A pesquisar…',noResults:'Não foram encontradas cidades. Tenta outro nome.',selectCity:'Pesquisa e seleciona primeiro uma cidade.',starting:'A iniciar…',map:'A preparar o mapa',install:'A ativar o screensaver…',complete:'Pronto! O screensaver está configurado.',restoring:'A repor…',restored:'O screensaver anterior foi reposto.',service:'O serviço root do Homebrew Channel não está disponível.',failed:'Não foi possível concluir: ',installed:'Localização atual: ',press:'Seleciona uma cidade nos resultados.'}
+ };
+ var el=function(id){return document.getElementById(id);},language=/^pt/i.test(navigator.language||'')?'pt':'en',units='metric',radius=5,selected=null,busy=false,bridges=[];
+ var appDir=decodeURIComponent(location.pathname.replace(/\/[^\/]*$/,''));
+ function t(key){return text[language][key]||key;}
+ function update(){
+  document.documentElement.lang=language;
+  ['language','cityTitle','cityHelp','cityLabel','search','optionsTitle','radiusLabel','unitsLabel','prerequisite','save','restore','footer'].forEach(function(id){el(id).textContent=t(id);});
+  el('radius').textContent=radius+' km';el('units').textContent=t(units);el('less').setAttribute('aria-label',language==='pt'?'Diminuir raio':'Decrease radius');el('more').setAttribute('aria-label',language==='pt'?'Aumentar raio':'Increase radius');
+  if(selected)el('selected').textContent=t('selected')+selected.label;
+ }
+ function say(message,error){el('status').className=error?'error':'';el('status').textContent=message;}
+ function controls(disabled){busy=disabled;['search','save','restore','less','more','units','language','city'].forEach(function(id){el(id).disabled=disabled;});}
+ function quote(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
+ function call(action,argument,done){
+  var bridge;try{bridge=new PalmServiceBridge();}catch(e){return done({ok:false,error:t('service')});}
+  bridges.push(bridge);
+  var command='/usr/bin/node '+quote(appDir+'/payload/setup.js')+' '+quote(action);
+  if(argument)command+=' '+quote(btoa(unescape(encodeURIComponent(JSON.stringify(argument)))));
+  var timer=setTimeout(function(){finish({ok:false,error:t('service')});},50000),finished=false;
+  function finish(value){if(finished)return;finished=true;clearTimeout(timer);bridges=bridges.filter(function(b){return b!==bridge;});done(value);}
+  bridge.onservicecallback=function(message){
+   var reply={},result;try{reply=JSON.parse(message);}catch(e){}
+   if(reply.returnValue===false)return finish({ok:false,error:t('service')});
+   try{result=JSON.parse(String(reply.stdoutString||'').replace(/\s+$/,'').split('\n').pop());}catch(e){result={ok:false,error:t('service')};}
+   finish(result);
+  };
+  try{bridge.call('luna://org.webosbrew.hbchannel.service/exec',JSON.stringify({command:command}));}catch(e){finish({ok:false,error:t('service')});}
+ }
+ function choose(item){
+  selected={name:item.name,latitude:item.latitude,longitude:item.longitude,label:[item.name,item.region,item.country].filter(function(v,i,a){return v&&a.indexOf(v)===i;}).join(', ')};
+  el('city').value=item.name;el('results').textContent='';el('selected').textContent=t('selected')+selected.label;say('');el('save').focus();
+ }
+ function search(){
+  if(busy)return;selected=null;el('selected').textContent='';el('results').textContent='';controls(true);say(t('searching'));
+  call('search',{name:el('city').value,language:language},function(result){
+   controls(false);if(!result.ok){say(t('failed')+result.error,true);return;}
+   if(!result.results.length){say(t('noResults'),true);el('city').focus();return;}
+   result.results.forEach(function(item){var button=document.createElement('button');button.type='button';button.textContent=[item.name,item.region,item.country].filter(function(v,i,a){return v&&a.indexOf(v)===i;}).join(', ');button.addEventListener('click',function(){choose(item);});el('results').appendChild(button);});
+   say(t('press'));el('results').firstChild.focus();
+  });
+ }
+ function poll(){call('status',null,function(result){
+  if(!result.ok){controls(false);say(t('failed')+result.error,true);el('save').focus();return;}
+  if(!result.running){controls(false);say(t('complete'));el('save').focus();return;}
+  say(result.phase==='map'?t('map')+(result.total?' · '+result.completed+'/'+result.total:'')+'…':result.phase==='install'?t('install'):t('starting'));
+  setTimeout(poll,1300);
+ });}
+ el('language').addEventListener('click',function(){language=language==='pt'?'en':'pt';update();});
+ el('units').addEventListener('click',function(){units=units==='metric'?'aviation':'metric';update();});
+ el('less').addEventListener('click',function(){radius=Math.max(1,radius-1);update();});
+ el('more').addEventListener('click',function(){radius=Math.min(50,radius+1);update();});
+ function checkCity(){if(selected&&el('city').value!==selected.name){selected=null;el('selected').textContent='';}}
+ el('city').addEventListener('input',checkCity);
+ el('city').addEventListener('change',checkCity);
+ el('city').addEventListener('keyup',checkCity);
+ el('search').addEventListener('click',search);
+ el('save').addEventListener('click',function(){
+  if(busy)return;checkCity();if(!selected){say(t('selectCity'),true);el('city').focus();return;}
+  controls(true);say(t('starting'));call('start',{location:{name:selected.name,latitude:selected.latitude,longitude:selected.longitude},radiusKm:radius,language:language,units:units},function(result){
+   if(!result.ok){controls(false);say(t('failed')+result.error,true);return;}setTimeout(poll,500);
+  });
+ });
+ el('restore').addEventListener('click',function(){if(busy)return;controls(true);say(t('restoring'));call('restore',null,function(result){controls(false);say(result.ok?t('restored'):t('failed')+result.error,!result.ok);el('restore').focus();});});
+ document.addEventListener('keydown',function(e){
+  var k=e.keyCode||e.which;
+  if(k===461||k===27){if(window.PalmSystem&&typeof window.PalmSystem.platformBack==='function')window.PalmSystem.platformBack();else window.close();return;}
+  if(k!==37&&k!==38&&k!==39&&k!==40)return;
+  var all=Array.prototype.slice.call(document.querySelectorAll('button:not([disabled]),input:not([disabled])')).filter(function(node){return node.offsetWidth||node.offsetHeight;});
+  var index=all.indexOf(document.activeElement),step=(k===37||k===38)?-1:1;
+  if(all.length){e.preventDefault();all[(index+step+all.length)%all.length].focus();}
+ });
+ update();
+ call('info',null,function(result){
+  if(result.ok&&result.config&&result.config.location){var p=result.config.location;selected={name:p.name,latitude:p.latitude,longitude:p.longitude,label:p.name};el('city').value=p.name;radius=result.config.radiusKm||5;units=result.config.units||'metric';language=result.config.language||language;update();}
+  else if(!result.ok)say(t('failed')+result.error,true);
+  el('city').focus();
+ });
+})();
+</script>
+</body>
+</html>

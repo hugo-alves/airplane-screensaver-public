@@ -1,0 +1,14 @@
+{
+  "id": "com.airplanescreensaver.app",
+  "version": "0.2.1",
+  "vendor": "Airplane Screensaver",
+  "type": "web",
+  "main": "index.html",
+  "title": "Airplane Screensaver",
+  "icon": "icon80.png",
+  "largeIcon": "icon130.png",
+  "iconColor": "#101b24",
+  "bgColor": "#0d171d",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true
+}

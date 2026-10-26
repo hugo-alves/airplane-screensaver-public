@@ -1,0 +1,3 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),esbuild=require('esbuild'),vm=require('node:vm');
+function load(file){const result=esbuild.buildSync({entryPoints:[file],bundle:true,write:false,platform:'node',format:'cjs'});const module={exports:{}};vm.runInNewContext(result.outputFiles[0].text,{module,exports:module.exports,require,Intl,console});return module.exports;}
+test('language and aviation conversions',()=>{const p=load('src/js/preferences.js');assert.equal(p.t('DISTÂNCIA','en'),'DISTANCE');assert.equal(p.t('DISTÂNCIA','pt'),'DISTÂNCIA');assert.equal(p.distance(18.52,'aviation','en'),'10.0 NM');assert.equal(p.altitude(304.8,'aviation','en'),'1,000 ft');assert.equal(p.speed(185.2,'aviation','en'),'100 kt');});

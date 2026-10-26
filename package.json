@@ -1,0 +1,22 @@
+{
+  "name": "airplane-screensaver",
+  "version": "0.2.1",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/flight-preview.cjs",
+    "prepare:lg": "node scripts/prepare-native.mjs",
+    "build:lg": "node scripts/package-lg.cjs",
+    "test": "npm run build:lg && node --test test/*.test.cjs",
+    "test:core": "node --test test/altitude.test.cjs test/geography.test.cjs test/preferences.test.cjs"
+  },
+  "dependencies": {
+    "@mapbox/vector-tile": "^2.0.5",
+    "esbuild": "^0.25.0",
+    "pbf": "^4.0.2"
+  },
+  "devDependencies": {
+    "@webos-tools/cli": "^3.2.6",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3"
+  }
+}

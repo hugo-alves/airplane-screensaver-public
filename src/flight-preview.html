@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de voos</title><link rel="stylesheet" href="styles/flights.css">
+<style>
+html,body{margin:0;width:100%;height:100%;background:#050708;overflow:hidden}body{display:flex;align-items:center;justify-content:center}#preview-shell{position:relative;width:100vw;height:56.25vw;max-width:177.7778vh;max-height:100vh}#preview-root{position:absolute;top:0;right:0;bottom:0;left:0}
+.preview-zone-button,.preview-test-link{position:absolute;right:33%;top:2.8%;z-index:10;border:1px solid #77817f;background:#0d1011;color:#c8d1cd;font:11px FlightMono,monospace;padding:6px 10px;cursor:pointer;text-decoration:none}
+.preview-test-link{right:40%;color:#94cea6}
+.preview-zone-button:focus{outline:2px solid #ff711c}.preview-zone-button:hover{color:#ff711c;border-color:#ff711c}
+.preview-controls{position:absolute;right:3%;top:9%;z-index:20;background:#171c1c;color:#f3efe7;border:1px solid #758680;padding:20px;width:300px;max-height:80%;overflow:auto;font:13px/1.6 FlightMono,monospace}
+.preview-controls[hidden]{display:none}.preview-controls label{display:block;margin:8px 0}.preview-controls input,.preview-controls select{width:100%;box-sizing:border-box;background:#0d1011;color:#fff;border:1px solid #758680;padding:8px;font:inherit}
+.preview-controls button{margin-top:14px;width:100%;background:#ff711c;color:#111;border:0;padding:10px;font:inherit;cursor:pointer}.preview-controls p{font-size:12px;color:#aab8b4}.preview-error{color:#ff9c6d!important}
+.preview-simulation{position:absolute;z-index:15;left:3.1%;bottom:.8%;font:11px FlightMono,monospace;color:#ff9c6d}
+@media(max-width:800px){.preview-zone-button,.preview-test-link{font-size:8px;padding:4px 6px}.preview-test-link{right:12%}.preview-simulation{font-size:8px}}
+body.design-preview .preview-zone-button,body.design-preview .preview-test-link{display:none}
+</style></head>
+<body><div id="preview-shell"><div id="preview-root"></div><button class="preview-zone-button" aria-expanded="false">ZONA</button><a class="preview-test-link" href="?simulation=1">TESTAR PASSAGEM</a>
+<form class="preview-controls" hidden><strong>Zona de observação</strong>
+<p class="preview-location-source">A zona escolhida fica guardada neste navegador. A pesquisa do nome é enviada ao Open-Meteo.</p>
+<label>Pesquisar cidade<input name="cityQuery" maxlength="80" placeholder="Cidade" autocomplete="off"></label>
+<button type="button" class="city-search">Pesquisar</button>
+<label>Resultados<select name="cityResult"><option value="">Escolhe um resultado</option></select></label>
+<label>Idioma<select name="language"><option value="pt">Português</option><option value="en">English</option></select></label>
+<label>Unidades<select name="units"><option value="metric">Métrico (km, m, km/h)</option><option value="aviation">Aviação (milhas náuticas, pés, nós)</option></select></label>
+<label>Nome<input name="name"  maxlength="40"></label>
+<label>Latitude<input name="latitude" type="number" step="any" min="-85" max="85" required></label>
+<label>Longitude<input name="longitude" type="number" step="any" min="-180" max="180" required></label>
+<label><span class="radius-label">Raio de observação (km)</span><input name="radius" type="number" min="1" max="50" step="1" required></label>
+<p class="preview-error" role="status"></p><button type="submit">Aplicar zona</button>
+<p>Dados reais por defeito. Para verificar o movimento sem tráfego, <a href="?simulation=1" style="color:#94cea6">abrir teste identificado</a>.</p>
+</form></div><script src="app.js"></script></body></html>
