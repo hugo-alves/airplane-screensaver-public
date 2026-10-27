@@ -34,6 +34,7 @@ export function normalizeFlightConfig(raw) {
     radiusKm: finite(input.radiusKm) && input.radiusKm >= 1 && input.radiusKm <= 50 ? input.radiusKm : 5,
     language: input.language === 'en' ? 'en' : 'pt',
     units: input.units === 'aviation' ? 'aviation' : 'metric',
+    theme: ['classic', 'coast', 'lavender', 'sage', 'evangelion', 'noir'].indexOf(input.theme) !== -1 ? input.theme : 'classic',
     pollSeconds: 10
   };
 }

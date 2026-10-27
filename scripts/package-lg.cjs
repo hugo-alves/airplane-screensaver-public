@@ -20,7 +20,7 @@ const converted = ts.transpileModule(bundled, {compilerOptions:{target:ts.Script
 const polyfills = "if (!ArrayBuffer.isView) ArrayBuffer.isView=function(v){return v&&v.buffer instanceof ArrayBuffer;};\n";
 fs.writeFileSync(path.join(payload,'vector-bundle.js'), polyfills + converted);
 
-for (const name of ['setup.js','map-create.js','backend.js','map-render.js','radar.qml','install.js','boot.js','assets.js','legacy-guard.js']) {
+for (const name of ['setup.js','map-create.js','map-bounds.js','backend.js','map-render.js','radar.qml','install.js','boot.js','assets.js','legacy-guard.js']) {
   fs.copyFileSync(path.join(root,'native',name), path.join(payload,name));
 }
 fs.copyFileSync(path.join(build,'native/core.js'), path.join(payload,'core.js'));

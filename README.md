@@ -1,6 +1,6 @@
 # Airplane screensaver for LG webOS
 
-An experimental aircraft-tracking screensaver for rooted LG webOS TVs. It shows nearby aircraft on an animated map with estimated positions, trails and flight information. Choose a city, observation radius, Portuguese or English, and metric or aviation units.
+An experimental aircraft-tracking screensaver for rooted LG webOS TVs. It shows nearby aircraft on an animated map with estimated positions, trails and flight information. Choose a city, observation radius, Portuguese or English, metric or aviation units, and one of six display themes: Classic, Coast, Lavender, Sage, Evangelion or Noir. The Evangelion theme includes an explicitly vulgar Japanese phrase in its header.
 
 [Download the experimental installer](https://github.com/hugo-alves/airplane-screensaver-public/releases) · [LG installation](#lg-webos-install-and-configure-on-the-tv) · [Adapt to another platform](docs/PORTING.md) · [Project website](https://hugo-alves.github.io/airplane-screensaver-public/)
 
@@ -37,7 +37,7 @@ npm run build:lg
 
 The resulting file is `build/com.airplanescreensaver.app_0.2.1_all.ipk`. It can be shared without first adding anyone's coordinates.
 
-Open **Airplane Screensaver** on the TV. Search for a city with the TV keyboard, select the correct result, choose the observation radius, language and units, and select **Prepare and activate**. The TV downloads and prepares the map, then activates the screensaver. The radius control is always in kilometres (1–50 km); display units can be metric or aviation. To change settings later, reopen the app and repeat the selection. The app's **Restore previous screensaver** button restores the saved Glasshouse Starfield files and removes this project's boot hook.
+Open **Airplane Screensaver** on the TV. Search for a city with the TV keyboard, select the correct result, choose the observation radius, language, units and theme, and select **Prepare and activate**. The TV downloads and prepares the map, then activates the screensaver. The radius control is always in kilometres (1–50 km); display units can be metric or aviation. To change settings later, reopen the app and repeat the selection. The app's **Restore previous screensaver** button restores the saved Glasshouse Starfield files and removes this project's boot hook.
 
 The chosen location and maps are kept on the TV in a private configuration directory. The local helper also provides the exact configured location over an unauthenticated loopback endpoint: other applications on the TV that can access that endpoint can read it. It is not directly exposed on the local network. The initial download needs internet access and can take a little while. City searches use Open-Meteo, map downloads use OpenFreeMap, and aircraft providers receive approximate coordinates; see Privacy below.
 
@@ -49,7 +49,7 @@ On the computer, create a private settings JSON file outside this repository. Th
 {"location":{"name":"Tokyo","latitude":35.6895,"longitude":139.6917},"radiusKm":5,"language":"en","units":"aviation"}
 ```
 
-`language` is `pt` or `en`; `units` is `metric` or `aviation`. The radius in this file is always in kilometres. Run `npm install`, then:
+`language` is `pt` or `en`; `units` is `metric` or `aviation`. Optional `theme` is `classic`, `coast`, `lavender`, `sage`, `evangelion` or `noir`; existing configurations default to `classic`. The radius in this file is always in kilometres. Run `npm install`, then:
 
 ```sh
 npm run prepare:lg -- /absolute/path/to/settings.json
@@ -59,7 +59,7 @@ This generates `build/native/`, containing the configuration, a map for that are
 
 Transfer the entire `build/native/` folder to a temporary directory on the TV using an already configured root-access method. On the TV, from that transferred directory, run `node install.js install` as root. The installer checks that Glasshouse Starfield is selected and mounted, saves the original QML, copies its own resources, starts the helper, verifies that the expected helper process is responding, and installs a boot hook. It refuses to overwrite an unrecognised replacement. If the older TV Clean radar is present, the installer adds a reversible guard to its known installer so it cannot retake the slot while this one is active; unknown versions are refused. The guard is removed on restore. Running it modifies the TV's Glasshouse screensaver and boot configuration.
 
-To restore the saved original, run `node /var/lib/airplane-screensaver/install.js restore` as root. To inspect the hook and helper state, use the same command with `status`. With this advanced method, changing location, radius, language or units requires preparing and transferring a new package and rerunning the installer. Neither successful preparation nor a status report establishes that the picture is visible or survives a physical TV restart; check those separately.
+To restore the saved original, run `node /var/lib/airplane-screensaver/install.js restore` as root. To inspect the hook and helper state, use the same command with `status`. With this advanced method, changing location, radius, language, units or theme requires preparing and transferring a new package and rerunning the installer. Neither successful preparation nor a status report establishes that the picture is visible or survives a physical TV restart; check those separately.
 
 ## Privacy and data
 

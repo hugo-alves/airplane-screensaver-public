@@ -12,6 +12,11 @@ html,body{margin:0;width:100%;height:100%;background:#050708;overflow:hidden}bod
 .preview-controls button{margin-top:14px;width:100%;background:#ff711c;color:#111;border:0;padding:10px;font:inherit;cursor:pointer}.preview-controls p{font-size:12px;color:#aab8b4}.preview-error{color:#ff9c6d!important}
 .preview-simulation{position:absolute;z-index:15;left:3.1%;bottom:.8%;font:11px FlightMono,monospace;color:#ff9c6d}
 @media(max-width:800px){.preview-zone-button,.preview-test-link{font-size:8px;padding:4px 6px}.preview-test-link{right:12%}.preview-simulation{font-size:8px}}
+/* Keep preview controls outside the artwork so they do not cover the title. */
+body:not(.design-preview){padding-top:42px;box-sizing:border-box}
+body:not(.design-preview) #preview-shell{max-height:calc(100vh - 42px);max-width:calc(177.7778vh - 74.667px)}
+body:not(.design-preview) .preview-zone-button{top:-35px;right:0}
+body:not(.design-preview) .preview-test-link{top:-35px;right:72px}
 body.design-preview .preview-zone-button,body.design-preview .preview-test-link{display:none}
 </style></head>
 <body><div id="preview-shell"><div id="preview-root"></div><button class="preview-zone-button" aria-expanded="false">ZONA</button><a class="preview-test-link" href="?simulation=1">TESTAR PASSAGEM</a>
@@ -21,6 +26,7 @@ body.design-preview .preview-zone-button,body.design-preview .preview-test-link{
 <button type="button" class="city-search">Pesquisar</button>
 <label>Resultados<select name="cityResult"><option value="">Escolhe um resultado</option></select></label>
 <label>Idioma<select name="language"><option value="pt">Português</option><option value="en">English</option></select></label>
+<label>Tema<select name="theme"><option value="classic">Clássico</option><option value="coast">Costa</option><option value="lavender">Lavanda</option><option value="sage">Sálvia</option><option value="evangelion">Evangelion</option><option value="noir">Noir</option></select></label>
 <label>Unidades<select name="units"><option value="metric">Métrico (km, m, km/h)</option><option value="aviation">Aviação (milhas náuticas, pés, nós)</option></select></label>
 <label>Nome<input name="name"  maxlength="40"></label>
 <label>Latitude<input name="latitude" type="number" step="any" min="-85" max="85" required></label>

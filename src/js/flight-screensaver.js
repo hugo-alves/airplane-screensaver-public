@@ -8,6 +8,17 @@ import {createFlightMap} from './flight-map.js';
 import {createFlightCamera, cameraPoint, aircraftMarkerScale, projectFlightNear} from './flight-camera.js';
 
 function text(element, value) { if (element.textContent !== value) element.textContent = value; }
+function routeText(element, value) {
+  if (element.textContent === value) return;
+  const parts = value.split(' → ');
+  if (parts.length !== 2) { element.textContent = value; return; }
+  element.textContent = '';
+  element.appendChild(document.createTextNode(parts[0] + ' '));
+  const arrow = document.createElement('span');
+  arrow.className = 'flight-route-arrow'; arrow.textContent = '→';
+  element.appendChild(arrow);
+  element.appendChild(document.createTextNode(' ' + parts[1]));
+}
 
 export function createFlightScreensaver(options) {
   const root = options.rootEl;
@@ -18,19 +29,20 @@ export function createFlightScreensaver(options) {
   screen.className = 'flight-screen';
   screen.hidden = true;
   screen.setAttribute('aria-label', 'Aviões nas proximidades');
-  screen.innerHTML = '<header class="flight-header"><h1>AVIÃO NAS PROXIMIDADES</h1><time class="flight-clock"></time></header>' +
+  screen.innerHTML = '<header class="flight-header"><h1>AVIÃO NAS PROXIMIDADES</h1><span class="flight-japanese" lang="ja">くたばれ、クソ野郎</span><time class="flight-clock"></time></header>' +
+    '<div class="flight-eva-brand" aria-hidden="true">NERV</div><div class="flight-eva-rail" aria-hidden="true"><span>01<br>MAPA</span><span>02<br>REGIÃO</span><span>03<br>RASTREIO</span></div>' +
     '<div class="flight-layout"><div class="flight-map">' +
       '<canvas class="flight-map-canvas" aria-label="Mapa da zona de observação"></canvas>' +
       '<svg class="flight-map-geometry" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
         '<g class="flight-trails"></g><circle class="flight-zone"></circle>' +
       '</svg><div class="flight-markers"></div>' +
       '<div class="flight-home-marker"><span>REFERÊNCIA</span></div>' +
-      '<div class="flight-map-status"><span class="flight-phase">À ESCUTA</span><span class="flight-scale"></span></div>' +
+      '<div class="flight-map-status"><span class="flight-phase">À ESCUTA</span><span class="flight-scale"></span></div><span class="flight-sage-phase" hidden></span>' +
       '<div class="flight-map-caption"><span>© OpenStreetMap · OpenFreeMap</span><span class="flight-location" hidden></span><span class="flight-count"></span></div>' +
     '</div><aside class="flight-information">' +
-      '<div class="flight-code">À ESCUTA</div>' +
-      '<div class="flight-route">A procurar aeronaves</div>' +
-      '<div class="flight-route-note"></div><div class="flight-aircraft"><div class="flight-airline">TRÁFEGO AÉREO</div><div class="flight-model">TRÁFEGO</div></div>' +
+      '<div class="flight-detail-phase">À ESCUTA</div><div class="flight-ident-label flight-eva-label">VOO</div><div class="flight-code">À ESCUTA</div>' +
+      '<div class="flight-route-label flight-eva-label">ORIGEM → DESTINO</div><div class="flight-route">A procurar aeronaves</div>' +
+      '<div class="flight-route-note"></div><div class="flight-airline-label flight-eva-label">COMPANHIA AÉREA</div><div class="flight-aircraft"><div class="flight-airline">TRÁFEGO AÉREO</div><div class="flight-model">TRÁFEGO</div></div>' +
       '<div class="flight-reading"><span>DISTÂNCIA</span><strong class="flight-distance">—</strong></div>' +
       '<div class="flight-reading"><span>ALTITUDE BAROMÉTRICA</span><strong class="flight-altitude">—</strong><small class="flight-altitude-note"></small></div>' +
       '<div class="flight-secondary"><span class="flight-speed">—</span><span class="flight-age">A ligar à fonte</span></div>' +
@@ -40,13 +52,31 @@ export function createFlightScreensaver(options) {
         '<a href="https://www.openmaptiles.org" target="_blank" rel="noreferrer">© OpenMapTiles</a></div>' +
         '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></footer>' +
     '</aside></div>';
+  const noirCredits = document.createElement('div');
+  noirCredits.className = 'flight-noir-attribution';
+  noirCredits.innerHTML = '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a> · <a href="https://www.openmaptiles.org" target="_blank" rel="noreferrer">© OpenMapTiles</a> · <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a> · ADSB.lol · ADSBdb';
+  screen.appendChild(noirCredits);
+  const outerScale = document.createElement('span');
+  outerScale.className = 'flight-scale-outside';
+  screen.querySelector('.flight-layout').appendChild(outerScale);
+  const headerAircraft = document.createElement('img');
+  headerAircraft.className = 'flight-header-aircraft';
+  headerAircraft.alt = '';
+  headerAircraft.src = resolveAppUrl('assets/flights/aircraft.png');
+  screen.querySelector('.flight-header').insertBefore(headerAircraft, screen.querySelector('.flight-header h1'));
+  const warning = document.createElement('img');
+  warning.className = 'flight-warning';
+  warning.alt = '';
+  warning.src = resolveAppUrl('assets/flights/warning-stripes.png');
+  screen.appendChild(warning);
   root.appendChild(screen);
   const el = {};
   ['map', 'markers', 'code', 'route', 'airline', 'model', 'distance', 'altitude',
-    'clock', 'route-note', 'altitude-note', 'speed', 'age', 'connection', 'location', 'count', 'trails', 'zone', 'phase', 'scale'].forEach(function (key) {
+    'clock', 'route-note', 'altitude-note', 'speed', 'age', 'connection', 'location', 'count', 'trails', 'zone', 'phase', 'detail-phase', 'scale'].forEach(function (key) {
     el[key] = screen.querySelector('.flight-' + key);
   });
   const homeMarker = screen.querySelector('.flight-home-marker');
+  const sagePhase = screen.querySelector('.flight-sage-phase');
   const svg = screen.querySelector('svg');
   text(screen.querySelector('.flight-home-marker span'), options.homeLabel || 'REFERÊNCIA');
   svg.setAttribute('viewBox', '0 0 ' + MAP_WIDTH + ' ' + MAP_HEIGHT);
@@ -85,7 +115,10 @@ export function createFlightScreensaver(options) {
   function paintZone() {
     const cfg = config();
     screen.setAttribute('aria-label', tr('Aviões nas proximidades'));
-    screen.querySelector('h1').textContent = tr('AVIÃO NAS PROXIMIDADES');
+    screen.querySelector('h1').textContent = ['coast','lavender','sage'].indexOf(cfg.theme) >= 0 ? (cfg.language === 'en' ? 'Aircraft nearby' : 'Avião nas proximidades') : tr('AVIÃO NAS PROXIMIDADES');
+    screen.querySelector('.flight-ident-label').textContent = cfg.language === 'en' ? 'FLIGHT' : 'VOO';
+    screen.querySelector('.flight-route-label').textContent = cfg.language === 'en' ? 'ORIGIN → DESTINATION' : 'ORIGEM → DESTINO';
+    screen.querySelector('.flight-airline-label').textContent = cfg.language === 'en' ? 'AIRLINE' : 'COMPANHIA AÉREA';
     screen.querySelector('canvas').setAttribute('aria-label', tr('Mapa da zona de observação'));
     screen.querySelector('.flight-home-marker span').textContent = tr('REFERÊNCIA');
     const readings = screen.querySelectorAll('.flight-reading span');
@@ -148,7 +181,7 @@ export function createFlightScreensaver(options) {
       if (options.replay && options.replay.done()) text(el.code, 'FIM');
       el.code.classList.add('is-long');
       el.code.style.setProperty('--flight-code-size', '6.1');
-      text(el.route, failures ? tr('Fonte temporariamente indisponível') : lastSuccess ? tr('Sem passagens próximas') : tr('A procurar aeronaves'));
+      routeText(el.route, failures ? tr('Fonte temporariamente indisponível') : lastSuccess ? tr('Sem passagens próximas') : tr('A procurar aeronaves'));
       if (options.replay && options.replay.done()) text(el.route, 'Repetição terminada');
       text(el['route-note'], '');
       el.route.classList.toggle('is-long', el.route.textContent.length > 22);
@@ -160,17 +193,19 @@ export function createFlightScreensaver(options) {
       return;
     }
     const extra = (metadata.get(selected.id + ':' + selected.callsign) || {}).value || {};
+    const friendly = ['coast','lavender','sage'].indexOf(config().theme) >= 0;
+    const display = function(value) { return friendly ? value : value.toLocaleUpperCase('pt-PT'); };
     text(el.code, extra.callsign || selected.callsign || selected.registration || selected.id.toUpperCase());
     el.code.classList.toggle('is-long', el.code.textContent.length > 7);
     el.code.style.setProperty('--flight-code-size', String(Math.min(6.1, 48 / el.code.textContent.length)));
-    text(el.route, extra.origin && extra.destination
-      ? extra.origin.toLocaleUpperCase('pt-PT') + ' → ' + extra.destination.toLocaleUpperCase('pt-PT')
+    routeText(el.route, extra.origin && extra.destination
+      ? display(extra.origin) + ' → ' + display(extra.destination)
       : tr('ROTA NÃO DISPONÍVEL'));
     el.route.classList.toggle('is-long', el.route.textContent.length > 22);
     text(el['route-note'], options.simulated ? tr('Rota simulada') : extra.origin && extra.destination ? tr('Rota publicada · ADSBdb') : tr('Rota não publicada pela fonte'));
-    text(el.airline, (extra.airline || tr('IDENTIFICAÇÃO DA AERONAVE')).toLocaleUpperCase('pt-PT'));
+    text(el.airline, display(extra.airline || tr('IDENTIFICAÇÃO DA AERONAVE')));
     el.airline.classList.toggle('is-long', el.airline.textContent.length > 22);
-    text(el.model, (extra.model || selected.model || extra.registration || selected.registration || tr('Modelo não disponível')).toLocaleUpperCase('pt-PT'));
+    text(el.model, display(extra.model || selected.model || extra.registration || selected.registration || tr('Modelo não disponível')));
     text(el.distance, distance(distanceKm(config().location, selected), config().units, config().language));
     const altitudeState = altitudeDisposition(selected.altitudeM);
     text(el.altitude, altitudeState === 'valid' ? altitude(selected.altitudeM, config().units, config().language) : '—');
@@ -192,7 +227,16 @@ export function createFlightScreensaver(options) {
       return point.x > -50 && point.x < MAP_WIDTH + 50 && point.y > -50 && point.y < MAP_HEIGHT + 50;
     }).slice(0, 40);
     const selected = selectAircraft(positions, config().location, selectedId);
-    const nextView = camera.update(selected, mapSize, now);
+    let nextView = camera.update(selected, mapSize, now);
+    // The circular viewport has less usable area at its corners. Widen the
+    // geographic view so both the reference and the aircraft remain visible.
+    if (config().theme === 'lavender') {
+      const factor = 1.2;
+      const width = nextView.width * factor, height = nextView.height * factor;
+      nextView = Object.assign({}, nextView, {x: nextView.x - (width - nextView.width) / 2,
+        y: nextView.y - (height - nextView.height) / 2, width: width, height: height,
+        spanKm: nextView.spanKm * factor, targetSpanKm: nextView.targetSpanKm * factor});
+    }
     view = map.render(nextView, mapSize) || nextView;
     const viewBox = [view.x, view.y, view.width, view.height].map(function (n) { return n.toFixed(4); }).join(' ');
     if (svg.getAttribute('viewBox') !== viewBox) svg.setAttribute('viewBox', viewBox);
@@ -204,6 +248,14 @@ export function createFlightScreensaver(options) {
       lastLabels = 0;
       requestMetadata(selected, now, generation);
     }
+    screen.classList.toggle('has-selected-aircraft', !!selected);
+    if (config().theme === 'sage' && selected) {
+      const point = cameraPoint(selected, view, mapSize);
+      const x = Math.max(4, Math.min(mapSize.width - Math.min(180, mapSize.width * .3), point.x + 24));
+      const y = Math.max(4, Math.min(mapSize.height - 24, point.y - 10));
+      sagePhase.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0)';
+      sagePhase.hidden = false;
+    } else sagePhase.hidden = true;
     const homePoint = cameraPoint(config().location, view, mapSize);
     homeMarker.style.transform = 'translate3d(' + homePoint.x.toFixed(2) + 'px,' + homePoint.y.toFixed(2) + 'px,0)';
     const present = new Set();
@@ -268,7 +320,7 @@ export function createFlightScreensaver(options) {
         trail.dataset.pointsAt = String(segment.points.length) + ':' + segment.points[segment.points.length - 1].at;
       }
       if (!lastTrailStyle || now - lastTrailStyle >= 950 || trail.dataset.selected !== String(segment.flightId === selectedId)) {
-        trail.style.stroke = segment.flightId === selectedId ? '#ff8b42' : '#b96b3d';
+        trail.style.stroke = segment.flightId === selectedId ? 'var(--flight-trail, #ff8b42)' : 'var(--flight-trail-other, #b96b3d)';
         trail.style.opacity = String(segment.opacity * (segment.flightId === selectedId ? .72 : .28));
         trail.style.strokeWidth = segment.flightId === selectedId ? '3px' : '2px';
         trail.dataset.selected = String(segment.flightId === selectedId);
@@ -282,7 +334,7 @@ export function createFlightScreensaver(options) {
       if (!liveConnector) {
         liveConnector = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         liveConnector.setAttribute('fill', 'none');
-        liveConnector.style.stroke = '#ff8b42';
+        liveConnector.style.stroke = 'var(--flight-trail, #ff8b42)';
         liveConnector.style.strokeWidth = '3px';
         liveConnector.style.opacity = '.72';
         el.trails.appendChild(liveConnector);
@@ -296,7 +348,10 @@ export function createFlightScreensaver(options) {
     if (!lastLabels || now - lastLabels > 950) {
       updateLabels(positions, selected, now);
       text(el.phase, tr(view.phase));
+      text(el['detail-phase'], tr(view.phase));
+      text(sagePhase, tr(view.phase));
       text(el.scale, distance(view.spanKm, config().units, config().language).toUpperCase() + (config().language === 'en' ? ' MAP WIDTH' : ' DE MAPA'));
+      text(outerScale, el.scale.textContent);
       el.map.dataset.cameraSpanKm = view.spanKm.toFixed(3);
       screen.dataset.selectedAircraft = selectedId || '';
       screen.dataset.lastFeedAt = String(lastSuccess);
@@ -329,6 +384,13 @@ export function createFlightScreensaver(options) {
       active = true;
       screen.hidden = false;
       currentConfig = normalizeFlightConfig(getConfig().flights);
+      screen.dataset.theme = currentConfig.theme || 'classic';
+      root.classList.toggle('noir-active', currentConfig.theme === 'noir');
+      // Move the explanation outside the compact telemetry row so it stays
+      // visible even when the measured barometric altitude is below zero.
+      if (currentConfig.theme === 'noir') screen.appendChild(el['altitude-note']);
+      else screen.querySelectorAll('.flight-reading')[1].appendChild(el['altitude-note']);
+      map.setTheme(currentConfig.theme);
       camera = createFlightCamera(currentConfig.location, currentConfig.radiusKm);
       paintZone();
       document.addEventListener('visibilitychange', syncVisibility);
@@ -340,6 +402,7 @@ export function createFlightScreensaver(options) {
       active = false;
       pause();
       screen.hidden = true;
+      root.classList.remove('noir-active');
       document.removeEventListener('visibilitychange', syncVisibility);
       window.removeEventListener('resize', resize);
       observer.disconnect();

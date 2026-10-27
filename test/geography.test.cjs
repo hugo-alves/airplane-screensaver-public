@@ -8,3 +8,11 @@ test('aircraft and camera use the nearest copy across the date line',()=>{
 test('provider distance uses nautical miles and allows for rounded coordinates',()=>{
  const d=load('src/js/flight-data.js');assert.match(d.aircraftUrl({location:{latitude:0,longitude:0},radiusKm:18.52}),/\/dist\/12$/);
 });
+
+
+test('theme normalization preserves supported choices and defaults older or invalid settings',()=>{
+ const c=load('src/js/flight-tracking.js');
+ for(const theme of ['classic','coast','lavender','sage','evangelion','noir']) assert.equal(c.normalizeFlightConfig({theme}).theme,theme);
+ assert.equal(c.normalizeFlightConfig({}).theme,'classic');
+ assert.equal(c.normalizeFlightConfig({theme:'other'}).theme,'classic');
+});

@@ -37,6 +37,7 @@ button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-col
   <h2 id="optionsTitle">Display settings</h2>
   <div class="option"><span id="radiusLabel">Observation radius</span><div class="line"><button id="less" type="button" aria-label="Decrease radius">−</button><strong id="radius" class="value">5 km</strong><button id="more" type="button" aria-label="Increase radius">+</button></div></div>
   <div class="option"><span id="unitsLabel">Units</span><button id="units" type="button">Metric</button></div>
+  <div class="option"><span id="themeLabel">Theme</span><button id="theme" type="button">Classic</button></div>
   <p class="muted" id="prerequisite">Requires a rooted LG TV, Homebrew Channel and Glasshouse, with Starfield selected.</p>
   <button class="primary wide" id="save" type="button">Prepare and activate</button>
   <button class="wide secondary" id="restore" type="button">Restore previous screensaver</button>
@@ -47,20 +48,20 @@ button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-col
 <script>
 (function(){
  var text={
-  en:{language:'English',cityTitle:'Choose a city',cityHelp:'Search and select a result. The city centre is enough.',cityLabel:'City',search:'Search',selected:'Selected: ',optionsTitle:'Display settings',radiusLabel:'Observation radius',unitsLabel:'Units',metric:'Metric',aviation:'Aviation',prerequisite:'Requires a rooted LG TV, Homebrew Channel and Glasshouse, with Starfield selected.',save:'Prepare and activate',restore:'Restore previous screensaver',footer:'Use the arrows and OK on your remote. Back closes this app.',searching:'Searching…',noResults:'No cities found. Try another name.',selectCity:'Search for and select a city first.',starting:'Starting…',map:'Preparing the map',install:'Activating the screensaver…',complete:'Ready! The screensaver is configured.',restoring:'Restoring…',restored:'The previous screensaver has been restored.',service:'Homebrew Channel root service is unavailable.',failed:'Could not complete setup: ',installed:'Current location: ',press:'Select a city from the results.'},
-  pt:{language:'Português',cityTitle:'Escolhe uma cidade',cityHelp:'Pesquisa e seleciona um resultado. O centro da cidade é suficiente.',cityLabel:'Cidade',search:'Pesquisar',selected:'Selecionada: ',optionsTitle:'Definições',radiusLabel:'Raio de observação',unitsLabel:'Unidades',metric:'Métricas',aviation:'Aviação',prerequisite:'Requer uma TV LG com root, Homebrew Channel e Glasshouse, com Starfield selecionado.',save:'Preparar e ativar',restore:'Repor screensaver anterior',footer:'Usa as setas e OK no comando. Voltar fecha esta aplicação.',searching:'A pesquisar…',noResults:'Não foram encontradas cidades. Tenta outro nome.',selectCity:'Pesquisa e seleciona primeiro uma cidade.',starting:'A iniciar…',map:'A preparar o mapa',install:'A ativar o screensaver…',complete:'Pronto! O screensaver está configurado.',restoring:'A repor…',restored:'O screensaver anterior foi reposto.',service:'O serviço root do Homebrew Channel não está disponível.',failed:'Não foi possível concluir: ',installed:'Localização atual: ',press:'Seleciona uma cidade nos resultados.'}
+  en:{language:'English',cityTitle:'Choose a city',cityHelp:'Search and select a result. The city centre is enough.',cityLabel:'City',search:'Search',selected:'Selected: ',optionsTitle:'Display settings',radiusLabel:'Observation radius',unitsLabel:'Units',themeLabel:'Theme',classic:'Classic',coast:'Coast',lavender:'Lavender',sage:'Sage',evangelion:'Evangelion',noir:'Noir',metric:'Metric',aviation:'Aviation',prerequisite:'Requires a rooted LG TV, Homebrew Channel and Glasshouse, with Starfield selected.',save:'Prepare and activate',restore:'Restore previous screensaver',footer:'Use the arrows and OK on your remote. Back closes this app.',searching:'Searching…',noResults:'No cities found. Try another name.',selectCity:'Search for and select a city first.',starting:'Starting…',map:'Preparing the map',install:'Activating the screensaver…',complete:'Ready! The screensaver is configured.',restoring:'Restoring…',restored:'The previous screensaver has been restored.',service:'Homebrew Channel root service is unavailable.',failed:'Could not complete setup: ',installed:'Current location: ',press:'Select a city from the results.'},
+  pt:{language:'Português',cityTitle:'Escolhe uma cidade',cityHelp:'Pesquisa e seleciona um resultado. O centro da cidade é suficiente.',cityLabel:'Cidade',search:'Pesquisar',selected:'Selecionada: ',optionsTitle:'Definições',radiusLabel:'Raio de observação',unitsLabel:'Unidades',themeLabel:'Tema',classic:'Clássico',coast:'Costa',lavender:'Lavanda',sage:'Sálvia',evangelion:'Evangelion',noir:'Noir',metric:'Métricas',aviation:'Aviação',prerequisite:'Requer uma TV LG com root, Homebrew Channel e Glasshouse, com Starfield selecionado.',save:'Preparar e ativar',restore:'Repor screensaver anterior',footer:'Usa as setas e OK no comando. Voltar fecha esta aplicação.',searching:'A pesquisar…',noResults:'Não foram encontradas cidades. Tenta outro nome.',selectCity:'Pesquisa e seleciona primeiro uma cidade.',starting:'A iniciar…',map:'A preparar o mapa',install:'A ativar o screensaver…',complete:'Pronto! O screensaver está configurado.',restoring:'A repor…',restored:'O screensaver anterior foi reposto.',service:'O serviço root do Homebrew Channel não está disponível.',failed:'Não foi possível concluir: ',installed:'Localização atual: ',press:'Seleciona uma cidade nos resultados.'}
  };
- var el=function(id){return document.getElementById(id);},language=/^pt/i.test(navigator.language||'')?'pt':'en',units='metric',radius=5,selected=null,busy=false,bridges=[];
+ var el=function(id){return document.getElementById(id);},language=/^pt/i.test(navigator.language||'')?'pt':'en',units='metric',theme='classic',themes=['classic','coast','lavender','sage','evangelion','noir'],radius=5,selected=null,busy=false,bridges=[];
  var appDir=decodeURIComponent(location.pathname.replace(/\/[^\/]*$/,''));
  function t(key){return text[language][key]||key;}
  function update(){
   document.documentElement.lang=language;
-  ['language','cityTitle','cityHelp','cityLabel','search','optionsTitle','radiusLabel','unitsLabel','prerequisite','save','restore','footer'].forEach(function(id){el(id).textContent=t(id);});
-  el('radius').textContent=radius+' km';el('units').textContent=t(units);el('less').setAttribute('aria-label',language==='pt'?'Diminuir raio':'Decrease radius');el('more').setAttribute('aria-label',language==='pt'?'Aumentar raio':'Increase radius');
+  ['language','cityTitle','cityHelp','cityLabel','search','optionsTitle','radiusLabel','unitsLabel','themeLabel','prerequisite','save','restore','footer'].forEach(function(id){el(id).textContent=t(id);});
+  el('radius').textContent=radius+' km';el('units').textContent=t(units);el('theme').textContent=t(theme);el('less').setAttribute('aria-label',language==='pt'?'Diminuir raio':'Decrease radius');el('more').setAttribute('aria-label',language==='pt'?'Aumentar raio':'Increase radius');
   if(selected)el('selected').textContent=t('selected')+selected.label;
  }
  function say(message,error){el('status').className=error?'error':'';el('status').textContent=message;}
- function controls(disabled){busy=disabled;['search','save','restore','less','more','units','language','city'].forEach(function(id){el(id).disabled=disabled;});}
+ function controls(disabled){busy=disabled;['search','save','restore','less','more','units','theme','language','city'].forEach(function(id){el(id).disabled=disabled;});}
  function quote(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
  function call(action,argument,done){
   var bridge;try{bridge=new PalmServiceBridge();}catch(e){return done({ok:false,error:t('service')});}
@@ -98,6 +99,7 @@ button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-col
  });}
  el('language').addEventListener('click',function(){language=language==='pt'?'en':'pt';update();});
  el('units').addEventListener('click',function(){units=units==='metric'?'aviation':'metric';update();});
+ el('theme').addEventListener('click',function(){theme=themes[(themes.indexOf(theme)+1)%themes.length];update();});
  el('less').addEventListener('click',function(){radius=Math.max(1,radius-1);update();});
  el('more').addEventListener('click',function(){radius=Math.min(50,radius+1);update();});
  function checkCity(){if(selected&&el('city').value!==selected.name){selected=null;el('selected').textContent='';}}
@@ -107,7 +109,7 @@ button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-col
  el('search').addEventListener('click',search);
  el('save').addEventListener('click',function(){
   if(busy)return;checkCity();if(!selected){say(t('selectCity'),true);el('city').focus();return;}
-  controls(true);say(t('starting'));call('start',{location:{name:selected.name,latitude:selected.latitude,longitude:selected.longitude},radiusKm:radius,language:language,units:units},function(result){
+  controls(true);say(t('starting'));call('start',{location:{name:selected.name,latitude:selected.latitude,longitude:selected.longitude},radiusKm:radius,language:language,units:units,theme:theme},function(result){
    if(!result.ok){controls(false);say(t('failed')+result.error,true);return;}setTimeout(poll,500);
   });
  });
@@ -122,7 +124,7 @@ button:disabled{opacity:.42}.primary{background:#8adfbd;color:#08221c;border-col
  });
  update();
  call('info',null,function(result){
-  if(result.ok&&result.config&&result.config.location){var p=result.config.location;selected={name:p.name,latitude:p.latitude,longitude:p.longitude,label:p.name};el('city').value=p.name;radius=result.config.radiusKm||5;units=result.config.units||'metric';language=result.config.language||language;update();}
+  if(result.ok&&result.config&&result.config.location){var p=result.config.location;selected={name:p.name,latitude:p.latitude,longitude:p.longitude,label:p.name};el('city').value=p.name;radius=result.config.radiusKm||5;units=result.config.units||'metric';theme=themes.indexOf(result.config.theme)>=0?result.config.theme:'classic';language=result.config.language||language;update();}
   else if(!result.ok)say(t('failed')+result.error,true);
   el('city').focus();
  });

@@ -8,7 +8,7 @@ async function openPreview(query,stored){
   const bundle=await esbuild.build({entryPoints:['src/js/flight-preview.js'],bundle:true,write:false,format:'iife',platform:'browser',plugins:[{
     name:'offline-map',setup(build){
       build.onResolve({filter:/^\.\/flight-map\.js$/},()=>({path:'offline-map',namespace:'test'}));
-      build.onLoad({filter:/.*/,namespace:'test'},()=>({contents:'export function createFlightMap(){return {render:function(v){return v},pause:function(){},resume:function(){},clear:function(){}}}',loader:'js'}));
+      build.onLoad({filter:/.*/,namespace:'test'},()=>({contents:'export function createFlightMap(){return {render:function(v){return v},setTheme:function(){},pause:function(){},resume:function(){},clear:function(){}}}',loader:'js'}));
     }
   }]});
   const requests=[];
@@ -68,4 +68,32 @@ test('normal live preview still asks for a location on a fresh browser',async()=
     assert.equal(d.querySelector('[name=latitude]').value,'');
     assert.equal(dom.window.localStorage.getItem('airplane-screensaver.zone'),null);
   }finally{dom.window.close();}
+});
+
+
+test('browser saves a chosen theme and reloads it',async()=>{
+  const first=await openPreview('?simulation=1&phase=overhead');
+  let saved;
+  try {
+    const d=first.dom.window.document;
+    d.querySelector('[name=theme]').value='noir';
+    d.querySelector('.preview-controls').dispatchEvent(new first.dom.window.Event('submit',{bubbles:true,cancelable:true}));
+    saved=JSON.parse(first.dom.window.localStorage.getItem('airplane-screensaver.zone'));
+    assert.equal(saved.theme,'noir');
+  } finally {first.dom.window.close();}
+  const next=await openPreview('?simulation=1&phase=overhead',saved);
+  try {assert.equal(next.dom.window.document.querySelector('[name=theme]').value,'noir');}
+  finally {next.dom.window.close();}
+});
+
+
+test('Evangelion theme renders the requested Japanese header and survives reload',async()=>{
+  const input={location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:5,language:'pt',units:'metric',theme:'evangelion'};
+  const {dom}=await openPreview('?simulation=1&phase=overhead',input);
+  try {
+    const d=dom.window.document;
+    await until(()=>d.querySelector('.flight-screen').dataset.theme==='evangelion');
+    assert.equal(d.querySelector('.flight-japanese').textContent,'くたばれ、クソ野郎');
+    assert.equal(d.querySelector('[name=theme]').value,'evangelion');
+  } finally {dom.window.close();}
 });

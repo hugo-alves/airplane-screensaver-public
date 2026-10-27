@@ -15,7 +15,9 @@ function validate(input){
  if(typeof p.name!=='string'||!p.name.trim()||p.name.length>100||typeof p.latitude!=='number'||typeof p.longitude!=='number'||!isFinite(lat)||Math.abs(lat)>85||!isFinite(lon)||Math.abs(lon)>180||!isFinite(radius)||radius<1||radius>50)throw new Error('Invalid location or radius');
  if(input.language!=='pt'&&input.language!=='en')throw new Error('Invalid language');
  if(input.units!=='metric'&&input.units!=='aviation')throw new Error('Invalid units');
- return {location:{name:p.name.trim().slice(0,40),latitude:lat,longitude:lon},radiusKm:radius,language:input.language,units:input.units};
+ var theme=input.theme===undefined?'classic':input.theme;
+ if(['classic','coast','lavender','sage','evangelion','noir'].indexOf(theme)<0)throw new Error('Invalid theme');
+ return {location:{name:p.name.trim().slice(0,40),latitude:lat,longitude:lon},radiusKm:radius,language:input.language,units:input.units,theme:theme};
 }
 function preflight(){
  var staged='/var/lib/tvweb/screensaver/.tvweb-screensaver',mounted='/usr/palm/applications/com.webos.app.screensaver/.tvweb-screensaver';

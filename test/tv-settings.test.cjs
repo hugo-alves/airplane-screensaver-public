@@ -42,10 +42,11 @@ test('on-TV setup searches for a city, selects it and applies the chosen setting
     assert.ok(!calls.find(c=>c.action==='search').command.includes('echo ignored'));
     d.querySelector('#results button').click();
     assert.match(d.getElementById('selected').textContent,/Tokyo, Japan/);
-    d.getElementById('more').click();d.getElementById('units').click();
+    d.getElementById('more').click();d.getElementById('units').click();d.getElementById('theme').click();d.getElementById('theme').click();
+    assert.equal(d.getElementById('theme').textContent,'Lavanda');
     d.getElementById('save').click();
     await until(()=>d.getElementById('status').textContent.includes('Pronto'));
-    assert.deepEqual(calls.find(c=>c.action==='start').arg,{location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:6,language:'pt',units:'aviation'});
+    assert.deepEqual(calls.find(c=>c.action==='start').arg,{location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:6,language:'pt',units:'aviation',theme:'lavender'});
     d.getElementById('restore').click();
     await until(()=>d.getElementById('status').textContent.includes('reposto'));
     assert.ok(calls.some(c=>c.action==='restore'));
@@ -79,4 +80,16 @@ test('editing the city after choosing a result cannot activate the old location'
     d.getElementById('city').value='Osaka';d.getElementById('save').click();
     assert.equal(starts,0);assert.match(d.getElementById('status').textContent,/select a city|seleciona primeiro/i);
   } finally {dom.window.close();}
+});
+
+
+test('on-TV setup restores the saved theme and falls back for older settings', async () => {
+  for (const [saved, label] of [['sage', 'Sage'], ['evangelion', 'Evangelion'], ['noir', 'Noir'], [undefined, 'Classic']]) {
+    const dom = new JSDOM(fs.readFileSync('native/app/index.html','utf8'), {url:'file:///app/index.html',runScripts:'dangerously',beforeParse(window){
+      Object.defineProperty(window.navigator,'language',{value:'en'});
+      window.PalmServiceBridge=function(){this.call=()=>setTimeout(()=>this.onservicecallback(JSON.stringify({stdoutString:JSON.stringify({ok:true,config:{location:{name:'Tokyo',latitude:35,longitude:139},radiusKm:5,language:'en',units:'metric',theme:saved}})})),0);};
+    }});
+    try { await until(()=>dom.window.document.activeElement.id==='city'); assert.equal(dom.window.document.getElementById('theme').textContent,label); if(saved==='noir'){dom.window.document.getElementById('theme').click();assert.equal(dom.window.document.getElementById('theme').textContent,'Classic');} }
+    finally { dom.window.close(); }
+  }
 });
