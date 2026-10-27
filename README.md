@@ -2,7 +2,7 @@
 
 An experimental aircraft-tracking screensaver for rooted LG webOS TVs. It shows nearby aircraft on an animated map with estimated positions, trails and flight information. Choose a city, observation radius, Portuguese or English, metric or aviation units, and one of six display themes: Classic, Coast, Lavender, Sage, Evangelion or Noir. The Evangelion theme includes an explicitly vulgar Japanese phrase in its header.
 
-[Download the experimental installer](https://github.com/hugo-alves/airplane-screensaver-public/releases) · [LG installation](#lg-webos-install-and-configure-on-the-tv) · [Adapt to another platform](docs/PORTING.md) · [Project website](https://hugo-alves.github.io/airplane-screensaver-public/)
+[Download the experimental installer](https://github.com/hugo-alves/airplane-screensaver-public/releases) · [LG installation](#lg-webos-install-and-configure-on-the-tv) · [Adapt to another platform](docs/PORTING.md) · [Project website](https://smallweirdthings.com/aircraft/)
 
 ![Airplane screensaver with a simulated aircraft over a public example location](docs/images/simulated-flight.webp)
 

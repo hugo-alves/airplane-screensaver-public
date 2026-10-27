@@ -2,7 +2,7 @@ name: Publish project website
 on:
   push:
     branches: [main]
-    paths: ["docs/**", "scripts/configure-posthog.py", ".github/workflows/pages.yml"]
+    paths: ["site-redirect/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,13 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Build browser analytics configuration
-        run: python3 scripts/configure-posthog.py --output docs/posthog-config.js
-        env:
-          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
-          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: docs
+          path: site-redirect
       - uses: actions/deploy-pages@v4
         id: deployment
