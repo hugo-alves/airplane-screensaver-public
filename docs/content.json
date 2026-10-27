@@ -1,0 +1,13 @@
+{
+  "name": "Airplane Screensaver",
+  "url": "https://hugo-alves.github.io/airplane-screensaver-public/",
+  "reviewedAt": "2026-10-27",
+  "pages": [
+    {
+      "url": "https://hugo-alves.github.io/airplane-screensaver-public/about-this-project.html",
+      "name": "Airplane Screensaver",
+      "description": "A quiet aircraft radar for your TV: watch nearby planes move across a map, with trails and flight details. An experimental screensaver for rooted LG webOS TVs.",
+      "note": "Built for a rooted LG TV with Glasshouse. A browser preview is also available in the project."
+    }
+  ]
+}
