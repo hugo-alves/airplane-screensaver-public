@@ -82,12 +82,21 @@ function drawGeometry(ctx, geometry, polygon) {
   });
 }
 
-function rasterize(bytes, tile) {
+const MAP_PALETTES = {
+  classic: {base:'#11191d', landcover:'#19272a', residential:'#131f27', landuse:'#192a30', park:'#172a2c', water:'#153743', waterway:'#164650', aeroway:'#243943', road:'#2f4a59', tertiary:'#45606e', major:'#526f7e', motorway:'#718e9c', rail:'#506068', path:'#414f50', label:'#c0ccc8', secondaryLabel:'#7e9698'},
+  noir: {base:'#0b1018', landcover:'#101721', residential:'#121820', landuse:'#111821', park:'#0d151d', water:'#0b141f', waterway:'#17222b', aeroway:'#20252b', road:'#303b44', tertiary:'#46525b', major:'#68737a', motorway:'#929ba0', rail:'#49525a', path:'#2d363d', label:'#707b82', secondaryLabel:'#4f5a63'},
+  evangelion: {base:'#080d0d', landcover:'#111e17', residential:'#0d1516', landuse:'#121e19', park:'#102519', water:'#001923', waterway:'#12323b', aeroway:'#273334', road:'#445350', tertiary:'#687370', major:'#9ba7a0', motorway:'#d3d8cb', rail:'#66716c', path:'#394741', label:'#e8e8dc', secondaryLabel:'#9aa9a1'},
+  coast: {base:'#f7f5eb', landcover:'#e7eddb', residential:'#f2f0e6', landuse:'#e8eedf', park:'#cfe2c7', water:'#b6dced', waterway:'#96c9dd', aeroway:'#dadfdc', road:'#d2dadd', tertiary:'#beced5', major:'#a4c3d0', motorway:'#88adc0', rail:'#a9b9bf', path:'#c4d0cd', label:'#23395c', secondaryLabel:'#566b7f'},
+  lavender: {base:'#eae6fb', landcover:'#e6ebdf', residential:'#eeeaf8', landuse:'#e4eadf', park:'#cbded0', water:'#90bdf3', waterway:'#83a9df', aeroway:'#d3d2e4', road:'#d0cbe1', tertiary:'#beb9d4', major:'#a9accd', motorway:'#96a6cc', rail:'#aaa2be', path:'#c3bcd4', label:'#40204e', secondaryLabel:'#69577b'},
+  sage: {base:'#e4ecd9', landcover:'#d0e0ca', residential:'#e0e9d7', landuse:'#cedfc9', park:'#afcfae', water:'#a5cabb', waterway:'#83b5a3', aeroway:'#bfcec1', road:'#c4d3bf', tertiary:'#a9c0aa', major:'#96b29d', motorway:'#83a590', rail:'#9caf9d', path:'#b4cab6', label:'#123f32', secondaryLabel:'#496b59'}
+};
+
+function rasterize(bytes, tile, palette) {
   const data = new VectorTile(new Pbf(new Uint8Array(bytes)));
   const image = document.createElement('canvas');
   image.width = TILE_PIXELS; image.height = TILE_PIXELS;
   const ctx = image.getContext('2d');
-  ctx.fillStyle = '#11191d'; ctx.fillRect(0, 0, TILE_PIXELS, TILE_PIXELS);
+  ctx.fillStyle = palette.base; ctx.fillRect(0, 0, TILE_PIXELS, TILE_PIXELS);
   const labels = [];
   function layer(name, style) {
     const source = data.layers[name];
@@ -109,22 +118,22 @@ function rasterize(bytes, tile) {
       ctx.restore();
     }
   }
-  layer('landcover', function () { return {fill: '#19272a'}; });
-  layer('landuse', function (p) { return {fill: p.class === 'residential' ? '#131f27' : '#192a30'}; });
-  layer('park', function () { return {fill: '#172a2c'}; });
-  layer('water', function () { return {fill: '#153743'}; });
-  layer('waterway', function () { return {stroke: '#164650', width: .8}; });
+  layer('landcover', function () { return {fill: palette.landcover}; });
+  layer('landuse', function (p) { return {fill: p.class === 'residential' ? palette.residential : palette.landuse}; });
+  layer('park', function () { return {fill: palette.park}; });
+  layer('water', function () { return {fill: palette.water}; });
+  layer('waterway', function () { return {stroke: palette.waterway, width: .8}; });
   // Buildings and local place labels compete with the aircraft at TV distance.
   layer('aeroway', function (p, type) {
-    return type === 3 ? {fill: '#243943'} : {stroke: '#45606e', width: p.class === 'runway' ? 3 : .8};
+    return type === 3 ? {fill: palette.aeroway} : {stroke: palette.tertiary, width: p.class === 'runway' ? 3 : .8};
   });
   layer('transportation', function (p) {
-    if (p.class === 'rail') return {stroke: '#506068', width: .6, dash: [2, 2]};
-    if (p.class === 'path' || p.class === 'track') return tile.zoom < 14 ? null : {stroke: '#414f50', width: .45};
-    if (p.class === 'motorway' || p.class === 'trunk') return {stroke: '#718e9c', width: 1.7};
-    if (p.class === 'primary' || p.class === 'secondary') return {stroke: '#526f7e', width: 1.1};
-    if (p.class === 'tertiary') return {stroke: '#45606e', width: .85};
-    return {stroke: '#2f4a59', width: .6};
+    if (p.class === 'rail') return {stroke: palette.rail, width: .6, dash: [2, 2]};
+    if (p.class === 'path' || p.class === 'track') return tile.zoom < 14 ? null : {stroke: palette.path, width: .45};
+    if (p.class === 'motorway' || p.class === 'trunk') return {stroke: palette.motorway, width: 1.7};
+    if (p.class === 'primary' || p.class === 'secondary') return {stroke: palette.major, width: 1.1};
+    if (p.class === 'tertiary') return {stroke: palette.tertiary, width: .85};
+    return {stroke: palette.road, width: .6};
   });
   const places = data.layers.place;
   const origin = tileOrigin(tile.x, tile.y, tile.zoom);
@@ -178,6 +187,7 @@ export function createFlightMap(canvas) {
   let transform = '';
   let redraws = 0;
   let cameraUpdates = 0;
+  let palette = MAP_PALETTES.classic;
 
   function preserve() {
     if (!frame || paintedZoom === null || previousFrame) return;
@@ -310,7 +320,7 @@ export function createFlightMap(canvas) {
         return response.arrayBuffer();
       }).then(function (bytes) {
         if (!active || gen !== generation) return;
-        remember(Object.assign({}, tile, rasterize(bytes, tile), {used: Date.now()}));
+        remember(Object.assign({}, tile, rasterize(bytes, tile, palette), {used: Date.now()}));
       }).catch(function () {
         if (active && gen === generation) remember(Object.assign({}, tile, {retryAt: Date.now() + 30000, used: Date.now()}));
       }).finally(function () {
@@ -328,6 +338,7 @@ export function createFlightMap(canvas) {
   }
 
   return {
+    setTheme: function (theme) { palette = MAP_PALETTES[theme] || MAP_PALETTES.classic; },
     resume: function () { active = true; metadata(); },
     pause: function () {
       active = false; generation += 1;
@@ -392,7 +403,7 @@ export function createFlightMap(canvas) {
       const width = surface.width, height = surface.height;
       if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
       ctx.setTransform(width / drawSize.width, 0, 0, height / drawSize.height, 0, 0);
-      ctx.fillStyle = '#11191d'; ctx.fillRect(0, 0, drawSize.width, drawSize.height);
+      ctx.fillStyle = palette.base; ctx.fillRect(0, 0, drawSize.width, drawSize.height);
       const keys = new Set((detailReady ? baseTiles.concat(detailTiles) : baseReady ? baseTiles : [])
         .map(function (tile) { return tile.key; }));
       const entries = Array.from(cache.values()).filter(function (tile) {
@@ -408,7 +419,7 @@ export function createFlightMap(canvas) {
       });
       const seen = new Set();
       const boxes = [{x: drawSize.width / 2 - 32, y: drawSize.height / 2 - 25, width: 92, height: 55}];
-      entries.slice().reverse().forEach(function (tile) {
+      (palette === MAP_PALETTES.noir ? [] : entries.slice().reverse()).forEach(function (tile) {
         tile.labels.forEach(function (label) {
           if (seen.has(label.text)) return;
           seen.add(label.text);
@@ -422,8 +433,8 @@ export function createFlightMap(canvas) {
           if (x < 12 || x > drawSize.width - 12 || y < 45 || y > drawSize.height - 35 ||
               boxes.some(function (b) { return box.x < b.x + b.width && box.x + box.width > b.x && box.y < b.y + b.height && box.y + box.height > b.y; })) return;
           boxes.push(box);
-          ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = '#11191d'; ctx.strokeText(label.text, x, y);
-          ctx.fillStyle = major ? '#c0ccc8' : '#7e9698'; ctx.fillText(label.text, x, y);
+          ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = palette.base; ctx.strokeText(label.text, x, y);
+          ctx.fillStyle = major ? palette.label : palette.secondaryLabel; ctx.fillText(label.text, x, y);
         });
       });
       canvas.dataset.loadedTiles = String(entries.length);

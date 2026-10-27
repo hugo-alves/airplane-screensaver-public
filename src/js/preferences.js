@@ -1,4 +1,5 @@
 const translations = {
+  'Tema':'Theme', 'Clássico':'Classic', 'Costa':'Coast', 'Lavanda':'Lavender', 'Sálvia':'Sage',
   'DADOS SIMULADOS':'SIMULATED DATA', 'Rota simulada':'Simulated route',
   'TESTE DE CÂMARA · DADOS SIMULADOS':'CAMERA TEST · SIMULATED DATA',
   'PRÉ-VISUALIZAÇÃO · DADOS DE EXEMPLO':'PREVIEW · EXAMPLE DATA',

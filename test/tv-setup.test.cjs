@@ -20,7 +20,7 @@ function waitForCompletion(f){return new Promise((resolve,reject)=>{const end=Da
 
 test('TV settings build a map and activate with the chosen city',async()=>{
  const f=fixture();try{
-  const settings={location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:7,language:'en',units:'aviation'};
+  const settings={location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:7,language:'en',units:'aviation',theme:'noir'};
   assert.deepEqual(f.call('start',settings),{ok:true});
   assert.equal((await waitForCompletion(f)).phase,'complete');
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.work,'config.json'),'utf8')),settings);
@@ -31,8 +31,18 @@ test('TV setup rejects invalid coordinates and an unselected Glasshouse screensa
  const f=fixture();try{
   const settings={location:{name:'City',latitude:null,longitude:0},radiusKm:5,language:'en',units:'metric'};
   assert.match(f.call('start',settings).error,/Invalid location/);
-  settings.location.latitude=0;fs.writeFileSync(f.staged,'clock');
+  settings.location.latitude=0;settings.theme='unknown';assert.match(f.call('start',settings).error,/Invalid theme/);delete settings.theme;fs.writeFileSync(f.staged,'clock');
   assert.match(f.call('start',settings).error,/Select Glasshouse Starfield/);
   assert.equal(fs.existsSync(path.join(f.work,'config.json')),false);
+ }finally{fs.rmSync(f.root,{recursive:true,force:true});}
+});
+
+
+test('TV setup accepts older settings without a theme and stores the classic fallback',async()=>{
+ const f=fixture();try{
+  const old={location:{name:'Tokyo',latitude:35.6895,longitude:139.6917},radiusKm:5,language:'en',units:'metric'};
+  assert.deepEqual(f.call('start',old),{ok:true});
+  await waitForCompletion(f);
+  assert.equal(f.call('info').config.theme,'classic');
  }finally{fs.rmSync(f.root,{recursive:true,force:true});}
 });

@@ -9,19 +9,15 @@ if (!file) throw Error('Usage: npm run prepare:lg -- /absolute/path/to/settings.
 const input = JSON.parse(fs.readFileSync(file, 'utf8'));
 const loc = input.location || {}, lat = Number(loc.latitude), lon = Number(loc.longitude), radius = Number(input.radiusKm);
 if (!Number.isFinite(lat) || Math.abs(lat) > 85 || !Number.isFinite(lon) || Math.abs(lon) > 180 || !Number.isFinite(radius) || radius < 1 || radius > 50) throw Error('Invalid coordinates or radius (1–50 km)');
-const config = {location:{name:String(loc.name || 'Area').slice(0,40),latitude:lat,longitude:lon},radiusKm:radius,language:input.language === 'en' ? 'en' : 'pt',units:input.units === 'aviation' ? 'aviation' : 'metric'};
+const config = {location:{name:String(loc.name || 'Area').slice(0,40),latitude:lat,longitude:lon},radiusKm:radius,language:input.language === 'en' ? 'en' : 'pt',units:input.units === 'aviation' ? 'aviation' : 'metric',theme:['classic','coast','lavender','sage','evangelion','noir'].includes(input.theme) ? input.theme : 'classic'};
 const out = path.resolve('build/native'); fs.mkdirSync(out,{recursive:true});
 execFileSync(process.execPath,['scripts/build-native-radar.cjs'],{stdio:'inherit'});
 const metadata = await (await fetch('https://tiles.openfreemap.org/planet')).json();
 const template = metadata.tiles[0];
 if (!/^https:\/\/tiles\.openfreemap\.org\/planet\/[a-z0-9_/-]+\/\{z\}\/\{x\}\/\{y\}\.pbf$/i.test(template)) throw Error('Invalid map source');
-// Small observation radii still need to cover the 20 km idle camera view.
-const dLat = Math.max(radius * 1.45, 8) / 111.2, dLon = Math.min(180, Math.max(radius * 1.45, 12) / 111.2 / Math.cos(lat * Math.PI / 180));
-const tx=(x,z)=>Math.floor((x+180)/360*2**z);
-const ty=(y,z)=>Math.floor((1-Math.asinh(Math.tan(Math.max(-85,Math.min(85,y))*Math.PI/180))/Math.PI)/2*2**z);
-let z=12, bounds;
-do {bounds={x0:tx(lon-dLon,z),x1:tx(lon+dLon,z),y0:ty(lat+dLat,z),y1:ty(lat-dLat,z)}; if ((bounds.x1-bounds.x0+1)*(bounds.y1-bounds.y0+1)<=100) break; z--; } while(z>=6);
-if(z<6) throw Error('Selected map area is too large');
+// Share the exact native camera coverage with the on-TV preparation path.
+const {boundsFor} = await import('../native/map-bounds.js');
+const plan = boundsFor(config, 100), z = plan.zoom, bounds = plan.bounds;
 const jobs=[]; for(let x=bounds.x0;x<=bounds.x1;x++) for(let y=bounds.y0;y<=bounds.y1;y++) jobs.push({x,y});
 function style(name,p,type){if(name==='water')return{fill:'#07333e'};if(name==='park')return{fill:'#1a2a29'};if(name==='landuse')return{fill:p.class==='residential'?'#151e22':'#1b282b'};if(name==='aeroway')return type===3?{fill:'#344247'}:{stroke:'#5a6c70',width:1.3};if(name==='transportation'){if(p.class==='path'||p.class==='track')return null;return{stroke:/^(motorway|trunk)$/.test(p.class)?'#b8beb0':/^(primary|secondary)$/.test(p.class)?'#939f98':'#506263',width:/^(motorway|trunk)$/.test(p.class)?1.6:.7};}return null;}
 const shapes=[]; let completed=0;

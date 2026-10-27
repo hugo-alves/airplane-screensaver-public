@@ -30,27 +30,8 @@ function style(name, p, type) {
  }
  return null;
 }
-function boundsFor(config) {
- var lat=config.location.latitude, lon=config.location.longitude, radius=config.radiusKm;
- // The observation radius can be 1 km, but the idle camera still shows a
- // 20 km-wide map. Cover that wider view (and its 20% canvas margin) too.
- var dLat=Math.max(radius*1.45,8)/111.2;
- var dLon=Math.min(180,Math.max(radius*1.45,12)/111.2/Math.cos(lat*Math.PI/180));
- function tx(x,z){return Math.floor((x+180)/360*Math.pow(2,z));}
- function ty(y,z){
-  var value=Math.tan(Math.max(-85,Math.min(85,y))*Math.PI/180);
-  var asinh=Math.log(value+Math.sqrt(value*value+1));
-  return Math.floor((1-asinh/Math.PI)/2*Math.pow(2,z));
- }
- var z=12,b,count;
- do {
-  count=Math.pow(2,z);
-  b={x0:tx(lon-dLon,z),x1:tx(lon+dLon,z),y0:Math.max(0,ty(lat+dLat,z)),y1:Math.min(count-1,ty(lat-dLat,z))};
-  if ((b.x1-b.x0+1)*(b.y1-b.y0+1)<=60) return {zoom:z,bounds:b};
-  z--;
- } while(z>=6);
- throw new Error('Selected map area is too large');
-}
+function boundsFor(config) { return require('./map-bounds.js').boundsFor(config, 60); }
+
 function create(config, out, progress, done) {
  var plan;
  try { plan=boundsFor(config); } catch(e) { return done(e); }

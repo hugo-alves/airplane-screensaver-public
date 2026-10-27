@@ -74,6 +74,7 @@ async function boot() {
     form.elements.radius.value = config.flights.units === 'aviation' ? +(config.flights.radiusKm / 1.852).toFixed(2) : +config.flights.radiusKm.toFixed(2);
     form.elements.language.value = config.flights.language;
     form.elements.units.value = config.flights.units;
+    form.elements.theme.value = config.flights.theme;
   }
   const originalText = new Map();
   [form, button, testLink, document.querySelector('.preview-simulation')].filter(Boolean).forEach(function(root) {
@@ -151,7 +152,7 @@ async function boot() {
     const radius = form.elements.units.value === 'aviation' ? Math.min(50, Math.max(1, radiusInput * 1.852)) : radiusInput;
     if (!Number.isFinite(radiusInput) || radiusInput < Number(form.elements.radius.min) || radiusInput > Number(form.elements.radius.max)) { form.querySelector('.preview-error').textContent = t('Escolhe um raio entre 1 e 50 km.', form.elements.language.value); return; }
     config.flights = normalizeFlightConfig({location: {name: form.elements.name.value.trim() || 'Zona definida',
-      latitude: latitude, longitude: longitude}, radiusKm: radius, language: form.elements.language.value, units: form.elements.units.value});
+      latitude: latitude, longitude: longitude}, radiusKm: radius, language: form.elements.language.value, units: form.elements.units.value, theme: form.elements.theme.value});
     localStorage.setItem('airplane-screensaver.zone', JSON.stringify(Object.assign({}, config.flights, {userLocation: true})));
     form.querySelector('.preview-error').textContent = '';
     radar.stop(); radar.start();
