@@ -29,6 +29,8 @@ test('a fresh browser can see a clearly labelled simulated flight without storin
     const d=dom.window.document;
     await until(()=>d.querySelector('.flight-code')&&d.querySelector('.flight-code').textContent==='TEST1234');
     assert.equal(d.querySelector('.flight-screen').hidden,false);
+    assert.match(d.querySelector('.flight-map-caption').textContent,/© OpenStreetMap contributors/);
+    assert.match(d.querySelector('.flight-map-caption').textContent,/© OpenMapTiles/);
     assert.match(d.querySelector('.preview-simulation').textContent,/SIMULADOS/);
     assert.doesNotMatch(d.querySelector('.preview-simulation').textContent,/REFERÊNCIA PÚBLICA|PUBLIC REFERENCE/i);
     await until(()=>d.querySelector('.flight-route-note').textContent==='Rota simulada');

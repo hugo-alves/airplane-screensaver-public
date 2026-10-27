@@ -38,7 +38,7 @@ export function createFlightScreensaver(options) {
       '</svg><div class="flight-markers"></div>' +
       '<div class="flight-home-marker"><span>REFERÊNCIA</span></div>' +
       '<div class="flight-map-status"><span class="flight-phase">À ESCUTA</span><span class="flight-scale"></span></div><span class="flight-sage-phase" hidden></span>' +
-      '<div class="flight-map-caption"><span>© OpenStreetMap · OpenFreeMap</span><span class="flight-location" hidden></span><span class="flight-count"></span></div>' +
+      '<div class="flight-map-caption"><span>© OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap</span><span class="flight-location" hidden></span><span class="flight-count"></span></div>' +
     '</div><aside class="flight-information">' +
       '<div class="flight-detail-phase">À ESCUTA</div><div class="flight-ident-label flight-eva-label">VOO</div><div class="flight-code">À ESCUTA</div>' +
       '<div class="flight-route-label flight-eva-label">ORIGEM → DESTINO</div><div class="flight-route">A procurar aeronaves</div>' +

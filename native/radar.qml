@@ -522,7 +522,7 @@ WebOSWindow {
         visible: win.modern && win.theme !== "coast"; x: 70; y: 1015; width: 1780; height: 60
         Text { x: 0; y: 0; width: 910; text: win.routeNote + "  ·  " + win.signal; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 17; elide: Text.ElideRight }
         Text { x: 0; y: 26; width: 910; text: win.dataAge + "  ·  " + win.tr("Posição estimada entre observações", "Position estimated between observations"); color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 17; elide: Text.ElideRight }
-        Text { x: 930; y: 0; width: 850; text: "© OpenStreetMap · © OpenMapTiles · OpenFreeMap · ADSB.fi · ADSB.lol · ADSBdb"; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 16; elide: Text.ElideRight }
+        Text { x: 930; y: 0; width: 850; text: "© OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap · ADSB.fi · ADSB.lol · ADSBdb"; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 16; elide: Text.ElideRight }
     }
     Item {
         visible: win.theme === "coast"; x: 70; y: 905; width: 620; height: 170
@@ -530,7 +530,7 @@ WebOSWindow {
         Text { y: 23; width: parent.width; text: win.signal; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 17; elide: Text.ElideRight }
         Text { y: 46; width: parent.width; text: win.dataAge; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 17; elide: Text.ElideRight }
         Text { y: 69; width: parent.width; text: win.tr("Posição estimada entre observações", "Position estimated between observations"); color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 17; elide: Text.ElideRight }
-        Text { y: 104; width: parent.width; text: "© OpenStreetMap · © OpenMapTiles · OpenFreeMap"; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 16; elide: Text.ElideRight }
+        Text { y: 104; width: parent.width; text: "© OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap"; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 16; elide: Text.ElideRight }
         Text { y: 126; width: parent.width; text: "ADSB.fi · ADSB.lol · ADSBdb"; color: win.secondaryColor; font.family: "sans-serif"; font.pixelSize: 16; elide: Text.ElideRight }
     }
     // The command-screen theme is a distinct composition, not a recoloured classic card.
@@ -560,7 +560,7 @@ WebOSWindow {
     }
     Item {
         visible: win.eva; x: 100; y: 1000; width: 1800; height: 70
-        Text { x: 0; y: 8; width: 1230; text: "© OpenStreetMap · © OpenMapTiles · OpenFreeMap · ADSB.fi · ADSB.lol · ADSBdb"; color: "#ddd8d1"; font.family: monoFont.name; font.pixelSize: 17; elide: Text.ElideRight }
+        Text { x: 0; y: 8; width: 1230; text: "© OpenStreetMap contributors · © OpenMapTiles · OpenFreeMap · ADSB.fi · ADSB.lol · ADSBdb"; color: "#ddd8d1"; font.family: monoFont.name; font.pixelSize: 17; elide: Text.ElideRight }
         Text { x: 1300; y: 0; width: 500; text: win.signal + " · " + win.dataAge; color: "#ddd8d1"; font.family: monoFont.name; font.pixelSize: 16; elide: Text.ElideRight }
         Text { x: 1300; y: 29; width: 500; text: win.tr("Posição estimada entre observações", "Position estimated between observations"); color: "#ddd8d1"; font.family: monoFont.name; font.pixelSize: 16; elide: Text.ElideRight }
     }
